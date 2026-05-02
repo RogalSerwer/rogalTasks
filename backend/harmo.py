@@ -99,7 +99,7 @@ for user in userData:
                         messageMap[user[0]][1] += f"\n{msg}"
 
             # Nie chcialem sie meczyc z porownywaniem daty w pythonie bo latwiej to zrobic po prostu w SQL
-            mycursor.execute(f"SELECT zadania.nazwa, DATE(zadania.data), discord, prnt.nazwa FROM zadania JOIN uzytkownicy ON uzytkownicy.ID=zadania.uzytkownik LEFT JOIN zadania AS prnt ON zadania.parentID=prnt.ID WHERE zadania.status!=100 AND DATE(zadania.data)<'{current.strftime("%Y-%m-%d")}' AND uzytkownicy.ID={user[0]};")
+            mycursor.execute(f"SELECT zadania.nazwa, DATE(zadania.data), discord, prnt.nazwa, uzytkownicy.androidToken FROM zadania JOIN uzytkownicy ON uzytkownicy.ID=zadania.uzytkownik LEFT JOIN zadania AS prnt ON zadania.parentID=prnt.ID WHERE zadania.status!=100 AND DATE(zadania.data)<'{current.strftime("%Y-%m-%d")}' AND uzytkownicy.ID={user[0]};")
             zadData = mycursor.fetchall()
             for zadanie in zadData:
                 # To bedzie zmieniane u kazdego uzytkownika
@@ -107,6 +107,7 @@ for user in userData:
                 if zadanie[3]!=None:
                     parent = f" o rodzicu {zadanie[3]}"
                 discordID = zadanie[2]
+                androidToken = zadanie[4]
                 if discordID!=0:
                     msg = f"Pamiętaj o wykonaniu swojego zaległego zadania {zadanie[0]} z dnia {zadanie[1]}{parent}!"
                     if not user[0] in messageMap.keys():
