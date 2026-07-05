@@ -19,11 +19,20 @@ app.config['MYSQL_DB'] = os.getenv('DB')
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 mysql = MySQL(app)
 
+@app.route("/zadaniaBasic/<int:ID>", methods=["GET"])
+def get_tasksBasic(ID):
+    cursor = mysql.connection.cursor()
+    cursor.execute(f"SELECT * FROM zadania WHERE uzytkownik={ID};")
+    temp = cursor.fetchall()
+    cursor.close()
+    return jsonify({"zadania" : temp})
+
+
 @app.route("/zadania/<int:ID>/<string:DATE>", methods=["GET"])
 def get_tasks(ID,DATE):
     where = ""
     if (DATE!="any"):
-        where = (f"HAVING date(parents.data)='{DATE}' ")
+        where = (f"HAVING date(parents.data)<='{DATE}' ")
     cursor = mysql.connection.cursor()
 
     # Skomplikowany kod SQL ktory pobiera zadania, przypisuje im dzieci i oblicza sredni stopien wykonania dla grupy
@@ -51,6 +60,23 @@ def addTask(USER):
     else:
         return jsonify({"message" : "Musisz wypełnić wszystkie dane w formularzu!"}),400
     
+@app.route("/noweZadanieDone/<int:USER>", methods=["POST"])
+def addDoneTask(USER):
+    nazwa = request.json.get("nazwa")
+    data = request.json.get("dataTemp")
+    rodzic = request.json.get("rodzic")
+    if nazwa and data and rodzic:
+        cursor = mysql.connection.cursor()
+        if data!="NULL":
+            cursor.execute(f"INSERT INTO zadania (status, uzytkownik, nazwa, data, parentID) VALUES (100, {USER}, '{nazwa}', '{data}', {rodzic})")
+        else:
+            cursor.execute(f"INSERT INTO zadania (status, uzytkownik, nazwa, data, parentID) VALUES (100, {USER}, '{nazwa}', {data}, {rodzic})")
+        mysql.connection.commit()
+        cursor.close()
+        return jsonify({"message":"Udalo sie dodac zadanie!"}), 201
+    else:
+        return jsonify({"message" : "Musisz wypełnić wszystkie dane w formularzu!"}),400
+
 @app.route("/usunZadanie/<int:ID>", methods=["DELETE"])
 def usunZadanie(ID):
     if ID:

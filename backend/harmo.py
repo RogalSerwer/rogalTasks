@@ -6,6 +6,7 @@ import discord
 import firebase_admin
 from firebase_admin import credentials, messaging
 import json
+from harmoHelpers import *
 
 load_dotenv()
 cred = credentials.Certificate("firebase.json")
@@ -15,7 +16,7 @@ HOST = "localhost"
 USER = "python"
 PASSWORD = os.getenv('PASS')
 TOKEN = os.getenv("DISCORD")
-current = datetime.datetime.now()
+CURRENT = datetime.datetime.now()
 
 # Baza
 mydb = mysql.connector.connect(
@@ -27,8 +28,16 @@ mydb = mysql.connector.connect(
 
 mycursor = mydb.cursor()
 
+def dailyDniUpdate(dni, name, user):
+    date = f"{CURRENT:%Y-%m-%d} {dni["time"]}"
+    nazwa = f"{name} - {date}"
+    sql = f"INSERT INTO zadania (status, data, nazwa, parentID, uzytkownik) VALUES (0, '{date}', '{nazwa}', 0, {user});"
+    mycursor.execute(sql)
+    sql = f"UPDATE harmonogram SET lastAdded='{date}' WHERE ID={id};"
+    mycursor.execute(sql)
+    
 # Przetwarzanie danych z harmonogramu tylko o 3 rano
-if current.strftime("%H")=='03':
+if CURRENT.strftime("%H")=='03' or True:
     mycursor.execute("SELECT * FROM harmonogram;")
     harmoData = mycursor.fetchall()
     for row in harmoData:
@@ -37,35 +46,27 @@ if current.strftime("%H")=='03':
         user = row[3]
         id = row[0]
         lastAdded = f"{row[5]:%Y-%m-%d}"
+        print(lastAdded)
         if (dni["type"]=="daily"):
-            timeStart = datetime.datetime.strptime(dni["date"], "%Y-%m-%d")
-            if current>timeStart:
-                lastAdded = datetime.datetime.strptime(lastAdded, "%Y-%m-%d")
-                interval = int(dni["interval"])
-                if (current >=  lastAdded +  datetime.timedelta(days=interval) or (f"{current:%Y-%m-%d}"==f"{timeStart:%Y-%m-%d}")):
-                    date = f"{current:%Y-%m-%d} {dni["time"]}"
-                    nazwa = f"{name} - {date}"
-                    sql = f"INSERT INTO zadania (status, data, nazwa, parentID, uzytkownik) VALUES (0, '{date}', '{nazwa}', 0, {user});"
-                    mycursor.execute(sql)
-                    sql = f"UPDATE harmonogram SET lastAdded='{date}' WHERE ID={id};"
-                    mycursor.execute(sql)
+            if (dailyDniParse(current, dni, lastAdded)):
+                dailyDniParse(dni, name, user)
         else:
             days = dni["days"]
             lastAdded = datetime.datetime.strptime(lastAdded, "%Y-%m-%d")
             if len(days)>0:
                 interval = int(dni["interval"])
-                if current < lastAdded-datetime.timedelta(days=lastAdded.weekday())+ datetime.timedelta(days=7) or current >= lastAdded-datetime.timedelta(days=lastAdded.weekday())+ datetime.timedelta(days=7*interval):
-                    dayID = current.weekday()
-                    print(current, lastAdded-datetime.timedelta(days=lastAdded.weekday())+ datetime.timedelta(days=7))
+                if CURRENT < lastAdded-datetime.timedelta(days=lastAdded.weekday())+ datetime.timedelta(days=7) or CURRENT >= lastAdded-datetime.timedelta(days=lastAdded.weekday())+ datetime.timedelta(days=7*interval):
+                    dayID = CURRENT.weekday()
+                    print(CURRENT, lastAdded-datetime.timedelta(days=lastAdded.weekday())+ datetime.timedelta(days=7))
                     for day in days:
                         if (dayID == day["id"]):
                             godzina = f"{day["hour"]:02d}:{day["minute"]:02d}"
-                            date = f"{current:%Y-%m-%d} {godzina}"
+                            date = f"{CURRENT:%Y-%m-%d} {godzina}"
                             nazwa = f"{name} - {date}"
                             sql = f"INSERT INTO zadania (status, data, nazwa, parentID, uzytkownik) VALUES (0, '{date}', '{nazwa}', 0, {user});"
                             mycursor.execute(sql)
                     if dayID == days[0]:
-                        date = current-datetime.timedelta(days=current.weekday())
+                        date = CURRENT-datetime.timedelta(days=CURRENT.weekday())
                         date = f"{date:%Y-%m-%d} 00:00:00"
                         sql = f"UPDATE harmonogram SET lastAdded='{date}' WHERE ID={id};"
                         mycursor.execute(sql)
@@ -87,9 +88,9 @@ for user in userData:
                 lst.append(f"{temp}")
             else:
                 lst.append(f"0{temp}")
-        if current.strftime("%H") in lst:
+        if CURRENT.strftime("%H") in lst or True:
             toSend = []
-            mycursor.execute(f"SELECT zadania.nazwa, TIME(zadania.data), discord, prnt.nazwa, uzytkownicy.androidToken FROM zadania JOIN uzytkownicy ON uzytkownicy.ID=zadania.uzytkownik LEFT JOIN zadania AS prnt ON prnt.ID=zadania.parentID WHERE zadania.status!=100 AND DATE(zadania.data)='{current.strftime("%Y-%m-%d")}' AND uzytkownicy.ID={user[0]};")
+            mycursor.execute(f"SELECT zadania.nazwa, TIME(zadania.data), discord, prnt.nazwa, uzytkownicy.androidToken FROM zadania JOIN uzytkownicy ON uzytkownicy.ID=zadania.uzytkownik LEFT JOIN zadania AS prnt ON prnt.ID=zadania.parentID WHERE zadania.status!=100 AND DATE(zadania.data)='{CURRENT.strftime("%Y-%m-%d")}' AND uzytkownicy.ID={user[0]};")
             zadData = mycursor.fetchall()
             for zadanie in zadData:
                 # To bedzie zmieniane u kazdego uzytkownika
@@ -106,7 +107,7 @@ for user in userData:
                         messageMap[user[0]][1] += f"\n{msg}"
 
             # Nie chcialem sie meczyc z porownywaniem daty w pythonie bo latwiej to zrobic po prostu w SQL
-            mycursor.execute(f"SELECT zadania.nazwa, DATE(zadania.data), discord, prnt.nazwa, uzytkownicy.androidToken FROM zadania JOIN uzytkownicy ON uzytkownicy.ID=zadania.uzytkownik LEFT JOIN zadania AS prnt ON zadania.parentID=prnt.ID WHERE zadania.status!=100 AND DATE(zadania.data)<'{current.strftime("%Y-%m-%d")}' AND uzytkownicy.ID={user[0]};")
+            mycursor.execute(f"SELECT zadania.nazwa, DATE(zadania.data), discord, prnt.nazwa, uzytkownicy.androidToken FROM zadania JOIN uzytkownicy ON uzytkownicy.ID=zadania.uzytkownik LEFT JOIN zadania AS prnt ON zadania.parentID=prnt.ID WHERE zadania.status!=100 AND DATE(zadania.data)<'{CURRENT.strftime("%Y-%m-%d")}' AND uzytkownicy.ID={user[0]};")
             zadData = mycursor.fetchall()
             for zadanie in zadData:
                 # To bedzie zmieniane u kazdego uzytkownika
