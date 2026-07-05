@@ -20,8 +20,7 @@ jobs:
       - name: Tests
         run: |
           cd backend
-          source venv/bin/activate
-          pytest tests.py
+          ./venv/bin/python -m pytest
           
     
     
