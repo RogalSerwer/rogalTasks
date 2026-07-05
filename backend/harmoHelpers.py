@@ -1,3 +1,5 @@
+import datetime
+
 def dailyDniParse(current, dni, lastAdded):
     timeStart = datetime.datetime.strptime(dni["date"], "%Y-%m-%d")
     if current>=timeStart:
