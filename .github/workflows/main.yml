@@ -18,7 +18,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Tests
-        run: pytest tests.py
+        run: |
+          cd backend
+          source venv/bin/activate
+          pytest tests.py
           
     
     
