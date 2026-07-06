@@ -2,7 +2,8 @@ name: PythonWorkflow
 
 on:
   push:
-
+env:
+  VENV: /home/rogal/projekty/rogalTasks/backend/venv
 jobs:
   test:
     runs-on: self-hosted
@@ -13,17 +14,14 @@ jobs:
       - name: Setup
         run: |
           cd backend
-          if [ ! -d venv ]; then
-            python3 -m venv venv
+          if [ ! -d "$VENV" ]; then
+            python3 -m venv "$VENV"
           fi
-          source venv/bin/activate
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          "$VENV/bin/python" -m pip install -r requirements.txt
       - name: Tests
         run: |
           cd backend
-          source venv/bin/activate
-          pytest tests.py
+          "$VENV/bin/python" -m pytest tests.py
           
     
     
