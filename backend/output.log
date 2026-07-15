@@ -1,5 +1,5 @@
-[2026-07-05 23:50:23 +0200] [1269179] [INFO] Starting gunicorn 25.3.0
-[2026-07-05 23:50:23 +0200] [1269179] [INFO] Listening at: http://192.168.1.101:5000 (1269179)
-[2026-07-05 23:50:23 +0200] [1269179] [INFO] Using worker: sync
-[2026-07-05 23:50:23 +0200] [1269188] [INFO] Booting worker with pid: 1269188
-[2026-07-05 23:50:23 +0200] [1269179] [INFO] Control socket listening at /run/user/1000/gunicorn.ctl
+[2026-07-15 13:13:03 +0200] [3262428] [INFO] Starting gunicorn 25.3.0
+[2026-07-15 13:13:03 +0200] [3262428] [INFO] Listening at: http://192.168.1.101:5000 (3262428)
+[2026-07-15 13:13:03 +0200] [3262428] [INFO] Using worker: sync
+[2026-07-15 13:13:03 +0200] [3262454] [INFO] Booting worker with pid: 3262454
+[2026-07-15 13:13:03 +0200] [3262428] [INFO] Control socket listening at /run/user/1000/gunicorn.ctl
