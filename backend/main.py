@@ -6,6 +6,7 @@ from flask_cors import CORS
 from datetime import datetime
 import os
 from dotenv import load_dotenv
+import datetime
 
 load_dotenv()
 
@@ -131,12 +132,20 @@ def noweHarmo(IDuser):
     dni = request.json.get("dniD")
     if "'" in str(dni):
         dni = json.dumps(dni)
+    temp = json.loads(dni)
     if IDuser and nazwa and dni:
         cursor = mysql.connection.cursor()
-        cursor.execute(
-            f"INSERT INTO harmonogram (nazwa, dni, uzytkownik) VALUES (%s, %s,{IDuser})",
-            (nazwa, dni),
-        )
+        print(dni)
+        if not checkIfLateAdder(temp):
+            cursor.execute(
+                f"INSERT INTO harmonogram (nazwa, dni, uzytkownik) VALUES (%s, %s,{IDuser})",
+                (nazwa, dni),
+            )
+        else:
+            cursor.execute(
+                f"INSERT INTO harmonogram (nazwa, dni, uzytkownik, lastAdded) VALUES (%s, %s,{IDuser}, %s)",
+                (nazwa, dni, temp["date"]),
+            )
         mysql.connection.commit()
         cursor.close()
         return jsonify({"message": "Udalo sie dodać nowy plan do harmonogramu!"}), 204
@@ -145,6 +154,14 @@ def noweHarmo(IDuser):
             {"message": "Nie udalo sie dodać nowego planu do harmonogramu!"}
         ), 401
 
+def checkIfLateAdder(dni):
+    if dni["type"] == "daily":
+        date = dni["date"]
+        date = datetime.datetime.strptime(date, "%Y-%m-%d")
+        current = datetime.datetime.now()
+        if date<current:
+            return True
+    return False
 
 @app.route("/harmonogramEdit/<int:ID>", methods=["PATCH"])
 def edytujHarmo(ID):

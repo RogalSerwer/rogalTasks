@@ -11,7 +11,7 @@ def loadCases():
         "A": {"interval": 1, "start": "2026-06-06", "lastAdded": "2026-06-05"},
         "B": {"interval": 2, "start": "2026-06-06", "lastAdded": "2026-06-05"},
         "C": {"interval": 3, "start": "2026-06-06", "lastAdded": "2026-06-05"},
-        "D": {"interval": 5, "start": "2026-06-06", "lastAdded": "2026-06-20"},
+        "D": {"interval": 5, "start": "2026-06-01", "lastAdded": "2026-06-01"},
         "E": {"interval": 7, "start": "2026-06-06", "lastAdded": "2026-06-05"},
         "F": {"interval": 1, "start": "2026-06-12", "lastAdded": "2026-06-05"},
         "G": {"interval": 2, "start": "2026-06-12", "lastAdded": "2026-06-05"},
@@ -26,6 +26,7 @@ def loadCases():
             continue
         for key, value in rowKeys.items():
             interval = rowKeys[key]["interval"]
+            print(rowKeys[key]["lastAdded"])
             cases.append(
                 (
                     date,
@@ -43,6 +44,9 @@ def loadCases():
                 rowKeys[key]["lastAdded"] = f"{date:%Y-%m-%d}"
 
         date = date + datetime.timedelta(days=1)
+    for case in cases:
+        if "2026-06-20" in cases[2]:
+            print(case)
     return cases
 
 

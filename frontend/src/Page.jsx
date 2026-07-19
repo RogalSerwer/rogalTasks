@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import ZadaniaLista from "./zadania.jsx"
 import ZadForm from "./noweZadania.jsx"
-import Harmonogram from "./harmonogram.jsx"
+import Harmonogram from "./harmonogram/harmonogram.jsx"
 import UserConfig from "./user.jsx"
 import './App.css'
 import './css/fontello.css'

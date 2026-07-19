@@ -36,7 +36,7 @@ def dailyDniUpdate(dni, name, user):
 
 
 # Przetwarzanie danych z harmonogramu tylko o 3 rano
-if CURRENT.strftime("%H") == "03" or True:
+if CURRENT.strftime("%H") == "03":
     mycursor.execute("SELECT * FROM harmonogram;")
     harmoData = mycursor.fetchall()
     for row in harmoData:
@@ -48,7 +48,7 @@ if CURRENT.strftime("%H") == "03" or True:
         print(lastAdded)
         if dni["type"] == "daily":
             if dailyDniParse(CURRENT, dni, lastAdded):
-                dailyDniParse(dni, name, user)
+                dailyDniUpdate(dni, name, user)
         else:
             days = dni["days"]
             lastAdded = datetime.datetime.strptime(lastAdded, "%Y-%m-%d")
@@ -100,7 +100,7 @@ for user in userData:
                 lst.append(f"{temp}")
             else:
                 lst.append(f"0{temp}")
-        if CURRENT.strftime("%H") in lst or True:
+        if CURRENT.strftime("%H") in lst:
             toSend = []
             mycursor.execute(
                 f"SELECT zadania.nazwa, TIME(zadania.data), discord, prnt.nazwa, uzytkownicy.androidToken FROM zadania JOIN uzytkownicy ON uzytkownicy.ID=zadania.uzytkownik LEFT JOIN zadania AS prnt ON prnt.ID=zadania.parentID WHERE zadania.status!=100 AND DATE(zadania.data)='{CURRENT.strftime('%Y-%m-%d')}' AND uzytkownicy.ID={user[0]};"
