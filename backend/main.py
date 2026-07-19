@@ -6,7 +6,6 @@ from flask_cors import CORS
 from datetime import datetime
 import os
 from dotenv import load_dotenv
-import datetime
 
 load_dotenv()
 
@@ -157,8 +156,8 @@ def noweHarmo(IDuser):
 def checkIfLateAdder(dni):
     if dni["type"] == "daily":
         date = dni["date"]
-        date = datetime.datetime.strptime(date, "%Y-%m-%d")
-        current = datetime.datetime.now()
+        date = datetime.strptime(date, "%Y-%m-%d")
+        current = datetime.now()
         if date<current:
             return True
     return False
