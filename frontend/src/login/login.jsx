@@ -14,7 +14,7 @@ function Login() {
 
     return <>
         <div>
-            <Button clickFunc={() => { mode == "login" ? setMode("register") : setMode("login")}}>{mode == "login" ? "Zaloguj się do usługi:" : "Zarejestruj się:"}</Button>
+            <Button clickFunc={() => { mode == "login" ? setMode("register") : setMode("login")}}>{mode == "login" ? "Zarejestruj się" : "Zaloguj się"}</Button>
             <form onSubmit={(e) => { mode == "login" ? login(e) : register(e) }}>
                 <div className='[&>*]:m-auto [&>*]:block [&>*]:mb-[4vh] w-fit m-auto'>
                     <ErrorBar>{errorState}</ErrorBar>

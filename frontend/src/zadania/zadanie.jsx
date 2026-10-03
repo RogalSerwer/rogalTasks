@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useRequestActions } from './zadania_service';
 import { getAutoHeight, useCSSAnimation } from './zadania_css';
-import { getDateFormatted, getLocalDate } from './zadania_time';
+import { getDateFormatted, getLocalDate, getLocalTimeToShow } from './zadania_time';
 import TaskButton from './buttons/taskButton';
 
 const Zadanie = ({ zadanie, d, child, callback }) => {
@@ -12,7 +12,6 @@ const Zadanie = ({ zadanie, d, child, callback }) => {
     const [data, setData] = useState(zadanie['data']);
     const { checkChildrenHeight, applyCSS, updateDiv } = useCSSAnimation(wysuniete, child, zadanie["ID"])
     const { removeTask, completeTask, updateTaskInfo } = useRequestActions(zadanie["ID"], callback, applyCSS)
-
     const wysunZadania = () => {
         let parent = document.querySelector(`div[data-id='child${zadanie["ID"]}']`);
         checkChildrenHeight(parent, false)
@@ -27,9 +26,10 @@ const Zadanie = ({ zadanie, d, child, callback }) => {
     const czas = getDateFormatted(data, child)
     if (!child) {
         var children = JSON.parse(zadanie.children);
-        children.sort(function (a, b) { return new Date(a["data"] + " GMT+0200") - new Date(b["data"] + " GMT+0200") })
+        children.sort(function (a, b) { return new Date(a["data"]) - new Date(b["data"])})
     }
     const dateFormat = getLocalDate(data)
+    let date = getLocalTimeToShow(data, child)        
 
     useEffect(() => {
         updateDiv();
@@ -44,7 +44,7 @@ const Zadanie = ({ zadanie, d, child, callback }) => {
                         {editMode ? <input type='datetime-local' onChange={(e) => {
                             const date = new Date(e.target.value);
                             setData(date.toUTCString());
-                        }} value={dateFormat}></input> : data}
+                        }} value={dateFormat}></input> : date}
                     </div>
                     {(!child) && (<div className='progress-bar' style={{ height: "3px", backgroundColor: "#73603c", width: "90%", margin: "auto", marginTop: "2vh", marginBottom: "1vh" }}><div className='progress' style={{ height: "100%", position: "relative", top: "0", left: "0", backgroundColor: "#ddddb6", width: (zadanie["ratio"] + "%") }}></div></div>)}
                 </div>

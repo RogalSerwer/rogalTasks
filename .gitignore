@@ -10,3 +10,4 @@ frontend/package-lock.json
 backend/tests/.~lock.test_daily.ods#
 .vscode
 backend/output.log
+.env

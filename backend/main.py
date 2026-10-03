@@ -13,10 +13,10 @@ app = Flask(__name__)
 CORS(app)
 bcrypt = Bcrypt(app)
 
-app.config["MYSQL_HOST"] = "localhost"
-app.config["MYSQL_USER"] = "python"
-app.config["MYSQL_PASSWORD"] = os.getenv("PASS")
-app.config["MYSQL_DB"] = os.getenv("DB")
+app.config["MYSQL_HOST"] = "db"
+app.config["MYSQL_USER"] = os.getenv("DB_USER")
+app.config["MYSQL_PASSWORD"] = os.getenv("PASSWORD")
+app.config["MYSQL_DB"] = os.getenv("DATABASE")
 app.config["MYSQL_CURSORCLASS"] = "DictCursor"
 mysql = MySQL(app)
 

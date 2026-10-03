@@ -9,7 +9,7 @@ export function onNewTaskInfo(blad, zamknijOkno, callback) {
     const [nazwa, setName] = useState("")
     const [rodzic, setParent] = useState("0")
     const [data, setDate] = useState(`${currentTime.getFullYear()}-${`${currentTime.getMonth() + 1}`.padStart(2, 0)}-${`${currentTime.getDate()}`.padStart(2, 0)}T12:00`)
-    const [dataNull, setNoDate] = useState(true)
+    const [dataNull, setNoDate] = useState(false)
     const onSubmit = async (e) => {
         e.preventDefault()
         let dataTemp = data;

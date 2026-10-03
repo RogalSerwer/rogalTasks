@@ -1,0 +1,32 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "${FRONTEND_PORT}:3000"
+    volumes:
+      - ./frontend:/tasksFrontend
+      - /tasksFrontend/node_modules
+    environment:
+      - VITE_BACKEND=${BACKEND_URL}
+  
+  backend:
+    build: ./backend
+    ports:
+      - "${BACKEND_PORT}:5000"
+    volumes:
+      - ./backend:/tasksBackend
+
+  db:
+    image: mariadb:11.8
+    environment:
+      MARIADB_ROOT_PASSWORD: "${PASSWORD_ROOT}"
+      MARIADB_DATABASE: "${DATABASE}"
+      MARIADB_USER: "${DB_USER}"
+      MARIADB_PASSWORD: "${PASSWORD}"
+    ports:
+     - "3306:3306"
+    volumes:
+      - tasksDB:/var/lib/mysql
+      - ./db_init.sql:/docker-entrypoint-initdb.d/init.sql
+volumes:
+  tasksDB:

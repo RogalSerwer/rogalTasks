@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 export function useWindow() {
     const [trybGlobal, trybSet] = useState([0]);
+    const [trybMain, trybMainSet] = useState([0]);
     const [oknoTaskForm, oknoTaskFormEnable] = useState(false);
 
     const bladOkna = (type) => {
@@ -35,6 +36,11 @@ export function useWindow() {
             document.getElementsByClassName("modal-hidden")[0].classList.remove("modal-hidden");
         }
     }
+    const changeView = (tryb) => {
+        oknoTaskFormEnable(false);
+        trybMainSet()
+        trybMainSet(tryb);
 
-    return { bladOkna, zamknijOkno, otworzOkno, trybGlobal }
+    }
+    return { bladOkna, zamknijOkno, otworzOkno, trybGlobal, trybMain, changeView }
 }

@@ -30,5 +30,9 @@
     "vite": "^6.3.5",
     "vitest": "^4.1.10"
   },
-  "proxy": "http://192.168.1.101:5000"
+  "proxy": {
+      "/api": {
+        "target": "http://backend:5000"
+      }
+  }
 }

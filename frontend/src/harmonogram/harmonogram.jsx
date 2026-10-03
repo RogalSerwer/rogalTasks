@@ -1,5 +1,5 @@
 import {useState, useEffect} from "react"
-import Scheduler from '../scheduler.jsx'
+import Scheduler from '../scheduler/scheduler.jsx'
 import { removeHarmonogram, createHarmonogram, editHarmonogram } from './harmonogram_service.js'
 import { parseDniDay, parseDniWeek } from "./harmonogram_mapper.js"
 import { useHarmonogramForm } from "./harmonogram_form.js"

@@ -32,8 +32,9 @@ export function useRequestActions(id, callback, applyCSS) {
         sendRequest(id, backendLink, callback, "PATCH", "wykonajZadanie")
     }
     const updateTaskInfo = async (nazwa, data) => {
+        let date = new Date(data).toISOString()
         const dane = {
-            nazwa, data
+            nazwa, data: date
         }
         sendRequest(id, backendLink, null, "PATCH", "updateTaskInfo", JSON.stringify(dane))
     }

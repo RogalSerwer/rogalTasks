@@ -6,7 +6,6 @@ import HeaderText from "../utils/headerText"
 const ZadForm = ({ zadania, zamknijOkno, blad, callback, }) => {
 
     const formData = onNewTaskInfo(blad, zamknijOkno, callback)
-
     return <form onSubmit={formData.onSubmit}>
         <HeaderText>Dodaj nowe zadanie</HeaderText>
         <ErrorBar></ErrorBar>
