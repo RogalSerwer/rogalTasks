@@ -6,7 +6,7 @@ import './css/fontello.css'
 import { useCookies } from 'react-cookie'
 import { AppContext } from './utils/AppContext.jsx'
 import rogal from '../assets/rogal.png';
-const backendLink = "https://tasks-backend.rogalrogalrogalrogal.online/"
+const backendLink = import.meta.env.VITE_BACKEND;
 function App() {
   const [cookies, setCookie] = useCookies(['loginID']);
   const login = (ID) => {

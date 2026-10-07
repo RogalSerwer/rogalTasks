@@ -6,6 +6,7 @@ from flask_cors import CORS
 from datetime import datetime
 import os
 from dotenv import load_dotenv
+from zoneinfo import ZoneInfo
 
 load_dotenv()
 
@@ -32,6 +33,8 @@ def get_tasksBasic(ID):
 
 @app.route("/zadania/<int:ID>/<string:DATE>", methods=["GET"])
 def get_tasks(ID, DATE):
+    timezone = datetime.now().astimezone().strftime("%z")
+    timezone = timezone[:3] + ":" + timezone[3:]
     where = ""
     if DATE != "any":
         where = f"HAVING date(parents.data)<='{DATE}' "
@@ -39,10 +42,14 @@ def get_tasks(ID, DATE):
 
     # Skomplikowany kod SQL ktory pobiera zadania, przypisuje im dzieci i oblicza sredni stopien wykonania dla grupy
     cursor.execute(
-        f"SELECT parents.*, JSON_ARRAYAGG(JSON_OBJECT('ID', children.ID, 'nazwa', children.nazwa, 'status', children.status, 'data', CONCAT(DATE_FORMAT(children.data, '%a, %d %b %Y %H:%i:%s'),' GMT'))) AS children, ratio.r AS ratio FROM (SELECT * FROM zadania WHERE status!=100) AS parents LEFT JOIN (SELECT * FROM zadania WHERE status!=100) AS children ON parents.ID=children.parentID LEFT JOIN (SELECT parentID,  SUM(status)/(COUNT(status)) AS r FROM zadania GROUP BY parentID HAVING parentID!=0) AS ratio ON ratio.parentID=parents.ID  WHERE parents.uzytkownik={ID} GROUP BY ID {where}ORDER BY data ASC, ID ASC;"
+        f"SELECT parents.*, JSON_ARRAYAGG(JSON_OBJECT('ID', children.ID, 'nazwa', children.nazwa, 'status', children.status, 'data', CONCAT(DATE_FORMAT(CONVERT_TZ(children.data, '{timezone}', '+00:00'), '%a, %d %b %Y %H:%i:%s'),' GMT'))) AS children, ratio.r AS ratio FROM (SELECT * FROM zadania WHERE status!=100) AS parents LEFT JOIN (SELECT * FROM zadania WHERE status!=100) AS children ON parents.ID=children.parentID LEFT JOIN (SELECT parentID,  SUM(status)/(COUNT(status)) AS r FROM zadania GROUP BY parentID HAVING parentID!=0) AS ratio ON ratio.parentID=parents.ID  WHERE parents.uzytkownik={ID} GROUP BY ID {where}ORDER BY data ASC, ID ASC;"
     )
 
     temp = cursor.fetchall()
+    for i in temp:
+        if i["data"] is not None:
+            i["data"] = i["data"].replace(tzinfo=ZoneInfo("Europe/Warsaw"))
+    
     cursor.close()
     return jsonify({"zadania": temp})
 
@@ -262,7 +269,7 @@ def removeUser(ID):
 @app.route("/updateTaskInfo/<int:ID>", methods=["PATCH"])
 def updateInfoTask(ID):
     data = request.json.get("data")
-    data = datetime.strptime(data, "%a, %d %b %Y %H:%M:%S %Z")
+    data = datetime.fromisoformat(data.replace("Z", "+00:00")).astimezone(ZoneInfo("Europe/Warsaw"))
     data = data.strftime("%Y-%m-%d %H:%M:%S")
     nazwa = request.json.get("nazwa")
     cursor = mysql.connection.cursor()
