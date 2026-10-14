@@ -1,0 +1,14 @@
+name: Dev Deployment
+on:
+  push:
+    branches:
+      - dev
+jobs:
+  deploy:
+    name: Deploy dev branch to the dev url
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Deploy Docker
+        run: deploy.sh
