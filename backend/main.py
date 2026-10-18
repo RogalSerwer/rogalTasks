@@ -5,10 +5,7 @@ from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from datetime import datetime
 import os
-from dotenv import load_dotenv
 from zoneinfo import ZoneInfo
-
-load_dotenv()
 
 app = Flask(__name__)
 CORS(app)

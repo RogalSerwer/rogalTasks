@@ -15,11 +15,15 @@ services:
       - "${BACKEND_PORT}:5000"
     volumes:
       - ./backend:/tasksBackend
+    environment:
+      - DB_USER=${DB_USER}
+      - PASSWORD=${PASSWORD}
+      - DATABASE=${DATABASE}
 
   db:
     image: mariadb:11.8
     environment:
-      MARIADB_ROOT_PASSWORD: "${PASSWORD_ROOT}"
+      MARIADB_ROOT_PASSWORD: "${PASSWORD}"
       MARIADB_DATABASE: "${DATABASE}"
       MARIADB_USER: "${DB_USER}"
       MARIADB_PASSWORD: "${PASSWORD}"
@@ -30,3 +34,4 @@ services:
       - ./db_init.sql:/docker-entrypoint-initdb.d/init.sql
 volumes:
   tasksDB:
+    name: tasksDB
