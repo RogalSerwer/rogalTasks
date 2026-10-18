@@ -20,7 +20,7 @@ CURRENT = datetime.datetime.now()
 
 # Baza
 mydb = mysql.connector.connect(
-    host=HOST, port=3306, user=USER, password=PASSWORD, database=DATABASE
+    host=HOST, port=3366, user=USER, password=PASSWORD, database=DATABASE
 )
 
 mycursor = mydb.cursor()
