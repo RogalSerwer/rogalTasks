@@ -11,4 +11,4 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Deploy Docker
-        run: deploy.sh
+        run: ./deploy.sh
