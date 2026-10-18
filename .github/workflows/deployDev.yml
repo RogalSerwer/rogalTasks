@@ -5,7 +5,7 @@ on:
       - dev
 jobs:
   deploy:
-    name: Deploy dev branch to the dev url
+    name: Deploy dev branch on server
     runs-on: self-hosted
     steps:
       - name: Checkout
