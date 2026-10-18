@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 cd "$(dirname "$0")"
 file="$HOME/.config/rogaltasks/main/.env"
 if [ -r $file ]; then
