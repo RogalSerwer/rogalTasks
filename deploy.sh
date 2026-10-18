@@ -2,6 +2,7 @@
 
 file="$HOME/.config/rogaltasks/main/.env"
 if [ -r $file ]; then
+    docker compose down
     docker compose rm -sfv frontend
     docker compose --env-file $file up -d --build
 else
