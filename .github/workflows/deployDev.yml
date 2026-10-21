@@ -8,6 +8,8 @@ jobs:
     name: Deploy dev branch on server
     runs-on: self-hosted
     steps:
+      - name: Teardown
+        run: ./teardown.sh
       - name: Checkout
         uses: actions/checkout@v6
       - name: Deploy Docker
