@@ -31,9 +31,11 @@ const Scheduler = ({ harmonogram, zadania }) => {
     harmonogram.forEach((entry) => {
         if (entry.dni.type == "weekly") {
             entry.dni.days.forEach((day) => {
-                const hourRowStart = `g${day.hour * 100 + day.minute}`
-                const hourRowEnd = `g${day.hour * 100 + 100 + day.minute}`
-                if (hourRowStart>=start && hourRowEnd<=start+numHours*100+100)
+                const hourRowStartVal = day.hour * 100 + day.minute;
+                const hourRowStart = `g${hourRowStartVal}`
+                const hourRowEndVal = day.hour * 100 + 100 + day.minute;
+                const hourRowEnd = `g${hourRowEndVal}`
+                if (hourRowStartVal>=start && hourRowEndVal<=start+numHours*100+100)
                     tasksForDays[day.id].push({ name: entry.nazwa, hourRowStart, hourRowEnd });
             })
         }
