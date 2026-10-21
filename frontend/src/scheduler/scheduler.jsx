@@ -6,6 +6,7 @@ const Scheduler = ({ harmonogram, zadania }) => {
     const numHours = 18;
     const start = 600;
 
+    
     now.setHours(0, 0, 0, 0);
     const startOfThisWeek = new Date(now - ((now.getDay() + 6) % 7) * 1000 * 60 * 60 * 24);
     const endOfThisWeek = new Date(now - ((now.getDay() + 6) % 7 - 6) * 1000 * 60 * 60 * 24);
