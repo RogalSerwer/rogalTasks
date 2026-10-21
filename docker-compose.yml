@@ -5,6 +5,7 @@ services:
       - "${FRONTEND_PORT}:3000"
     volumes:
       - ./frontend:/tasksFrontend
+      - /tasksFrontend/node_modules
     environment:
       - VITE_BACKEND=${BACKEND_URL}
   
