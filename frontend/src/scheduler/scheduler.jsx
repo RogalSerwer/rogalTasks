@@ -17,14 +17,18 @@ const Scheduler = ({ harmonogram, zadania }) => {
     const zads = zadania.filter(it => it["data"] != null).map(it => ({ "nazwa": it["nazwa"], "data": new Date(it["data"]) })).filter(it => it["data"] >= currentWeek && it["data"] <= currentWeekEnd);
     const tasksForDays = [[], [], [], [], [], [], []];
     const weekForward = () => {
-        const newWeek = new Date(currentWeek.getTime() + 7*24*60*60*1000);
-        const newEndWeek = new Date(currentWeek.getTime() + 13*24*60*60*1000);
+        const newWeek = new Date(currentWeek);
+        newWeek.setDate(newWeek.getDate() + 7)
+        const newEndWeek = new Date(currentWeek);
+        newEndWeek.setDate(newEndWeek.getDate() + 13)
         setCurrentWeek(newWeek);
         setCurrentWeekEnd(newEndWeek);
     }
     const weekBackward = () => {
-        const newWeek = new Date(currentWeek.getTime() - 7*24*60*60*1000);
-        const newEndWeek = new Date(currentWeek.getTime() - 24*60*60*1000);
+        const newWeek = new Date(currentWeek);
+        newWeek.setDate(newWeek.getDate() - 7)
+        const newEndWeek = new Date(currentWeek);
+        newEndWeek.setDate(newEndWeek.getDate() - 1)
         setCurrentWeek(newWeek);
         setCurrentWeekEnd(newEndWeek);
     }
@@ -57,7 +61,7 @@ const Scheduler = ({ harmonogram, zadania }) => {
                 console.log(entry.lastAdded)
                 const interval = parseInt(entry.dni.interval);
                 if (start < currentWeek) {
-                    const diff = ((currentWeek - start) / (24 * 60 * 60 * 1000)) % interval;
+                    const diff = Math.round((currentWeek - start) / (24 * 60 * 60 * 1000)) % interval;
                     console.log(diff);
                     if (diff!=0)
                         startThisWeek = ((interval - diff));
