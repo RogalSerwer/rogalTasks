@@ -9,7 +9,10 @@ services:
     command: sh -c "npm ci && npm run dev -- --host --port 3000"
     environment:
       - VITE_BACKEND=${BACKEND_URL}
-  
+    depends_on:
+      backend:
+        condition: service_started
+
   backend:
     build: ./backend
     ports:
@@ -20,6 +23,9 @@ services:
       - DB_USER=${DB_USER}
       - PASSWORD=${PASSWORD}
       - DATABASE=${DATABASE}
+    depends_on:
+      migration:
+        condition: service_completed_successfully
 
   db:
     image: mariadb:11.8
@@ -32,7 +38,21 @@ services:
      - "3366:3306"
     volumes:
       - tasksDB:/var/lib/mysql
-      - ./db_init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./migration/db_init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  migration:
+    build: ./migration
+    volumes:
+      - ./migration:/tasksMigration
+    environment:
+      - DB_USER=${DB_USER}
+      - PASSWORD=${PASSWORD}
+      - DATABASE=${DATABASE}
+    depends_on:
+      db:
+        condition: service_started
+    restart: "no"
+
 volumes:
   tasksDB:
     name: tasksDB
