@@ -8,7 +8,7 @@ HOST = "db"
 USER = os.getenv("DB_USER")
 PASSWORD = os.getenv("PASSWORD")
 
-# time.sleep(5)
+time.sleep(5)
 mydb = mysql.connector.connect(
     host=HOST, port=3306, user=USER, password=PASSWORD, database=DATABASE
 )
