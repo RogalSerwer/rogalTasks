@@ -1,13 +1,13 @@
-import { useRef, useState, useContext } from 'react'
+import { useRef, useState } from 'react'
 import { sendRequest } from './login_service';
-import { AppContext } from '../utils/AppContext.jsx'
+import { useAppContext } from '../utils/consts/AppContext.jsx'
 
 export function LoginData() {
     const loginRef = useRef(null);
     const passRef = useRef(null);
     const [errorState, setError] = useState("");
-    const backendLink = useContext(AppContext).backendLink;
-    const loginF = useContext(AppContext).login;
+    const backendLink = useAppContext().backendLink;
+    const loginF = useAppContext().login;
     const login = async (e) => {
         e.preventDefault()
         const dane = {

@@ -1,9 +1,14 @@
 import { useState } from 'react'
+import { useWindowContext } from '../utils/window/WindowContext.jsx'
 import HeaderText from "../utils/headerText"
+import PageButton from '../utils/pageButton.jsx'
 
 const Scheduler = ({ harmonogram, zadania }) => {
+
+    const { bladOkna, zamknijOkno, otworzOkno, trybGlobal, trybMain, changeView} = useWindowContext()
+
     const now = new Date();
-    const numHours = 18;
+    const numHours = 17;
     const start = 600;
 
     
@@ -15,7 +20,7 @@ const Scheduler = ({ harmonogram, zadania }) => {
     const days = ["Poniedzialek", "Wtorek", "Środa", "Czwartek", "Piatek", "Sobota", "Niedziela"];
     const hours = Array(numHours * 4).fill().map((x, i) => 100 * Math.floor((i * 15) / 60) + start + (i * 15) % 60)
     const rows = `${hours.map(hour => `[g${hour}] 0.6rem`).join(" ")}`
-    const zads = zadania.filter(it => it["data"] != null).map(it => ({ "nazwa": it["nazwa"], "data": new Date(it["data"]) })).filter(it => it["data"] >= currentWeek && it["data"] <= currentWeekEnd);
+    const zads = zadania.filter(it => it["data"] != null).map(it => ({ "nazwa": it["nazwa"], "data": new Date(it["data"]), "waga": it["waga"] })).filter(it => it["data"] >= currentWeek && it["data"] <= currentWeekEnd);
     const tasksForDays = [[], [], [], [], [], [], []];
     const weekForward = () => {
         const newWeek = new Date(currentWeek);
@@ -35,14 +40,29 @@ const Scheduler = ({ harmonogram, zadania }) => {
     }
     harmonogram.forEach((entry) => {
         if (entry.dni.type == "weekly") {
-            entry.dni.days.forEach((day) => {
-                const hourRowStartVal = day.hour * 100 + day.minute;
-                const hourRowStart = `g${hourRowStartVal}`
-                const hourRowEndVal = day.hour * 100 + 100 + day.minute;
-                const hourRowEnd = `g${hourRowEndVal}`
-                if (hourRowStartVal>=start && hourRowEndVal<=start+numHours*100+100)
-                    tasksForDays[day.id].push({ name: entry.nazwa, hourRowStart, hourRowEnd });
-            })
+            var pass = true;
+            if (entry.dni.interval>1)
+            {
+                const temp = new Date(entry.lastAdded);
+                const s = new Date(temp - ((temp.getDay() + 6) % 7) * 1000 * 60 * 60 * 24)
+                const year = s.getUTCFullYear();
+                const month = s.getUTCMonth();
+                const day = s.getUTCDate();
+                const interval = parseInt(entry.dni.interval)*7;
+                const start = new Date(year, month, day);
+                const diff = Math.round((currentWeek - start) / (24 * 60 * 60 * 1000)) % interval;
+                pass = diff==0;
+
+            }
+            if (pass)
+                entry.dni.days.forEach((day) => {
+                    const hourRowStartVal = day.hour * 100 + day.minute;
+                    const hourRowStart = `g${hourRowStartVal}`
+                    const hourRowEndVal = day.hour * 100 + 100 * entry["waga"] + day.minute;
+                    const hourRowEnd = `g${hourRowEndVal}`
+                    if (hourRowStartVal>=start && hourRowEndVal<=start+numHours*100+100)
+                        tasksForDays[day.id].push({ name: entry.nazwa, hourRowStart, hourRowEnd });
+                })
         }
         else if (entry.dni.type == "daily") {
             // Caly bullshit z UTC, nie wiem jak to naprawic zeby wszystko bylo poprawnie
@@ -52,18 +72,14 @@ const Scheduler = ({ harmonogram, zadania }) => {
             const day = s.getUTCDate();
             const [hour, minute] = entry.dni.time.split(":").map(Number)
             const hourRowStartVal = hour * 100 + minute;
-            const hourRowEndVal = hour * 100 + 100 + minute;
+            const hourRowEndVal = hour * 100 + 100*entry["waga"] + minute;
             if (hourRowStartVal>=start && hourRowEndVal<=start+numHours*100+100)
             {
                 const start = new Date(year, month, day);
-                console.log(start);
                 let startThisWeek;
-                console.log(entry.dni.date)
-                console.log(entry.lastAdded)
                 const interval = parseInt(entry.dni.interval);
                 if (start < currentWeek) {
                     const diff = Math.round((currentWeek - start) / (24 * 60 * 60 * 1000)) % interval;
-                    console.log(diff);
                     if (diff!=0)
                         startThisWeek = ((interval - diff));
                     else
@@ -71,7 +87,6 @@ const Scheduler = ({ harmonogram, zadania }) => {
                 }
                 else if (start <= currentWeekEnd) startThisWeek = (start.getDay() + 6) % 7;
                 else return;
-                console.log(startThisWeek)
                 if (startThisWeek>=7) return;
                 let days = [startThisWeek];
                 while (days[days.length - 1] + interval < 7) days.push(days[days.length - 1] + interval);
@@ -85,7 +100,7 @@ const Scheduler = ({ harmonogram, zadania }) => {
     })
     zads.forEach((entry) => {
         const hourRowStartVal = entry["data"].getHours() * 100 + entry["data"].getMinutes()
-        const hourRowEndVal = entry["data"].getHours() * 100 + entry["data"].getMinutes() + 100
+        const hourRowEndVal = entry["data"].getHours() * 100 + entry["data"].getMinutes() + 100*entry["waga"]
         const hourRowStart = `g${hourRowStartVal}`
         const hourRowEnd = `g${hourRowEndVal}`
         const day = `${(entry["data"].getDay() + 6) % 7}`
@@ -93,11 +108,16 @@ const Scheduler = ({ harmonogram, zadania }) => {
             tasksForDays[day].push({ name: entry.nazwa, hourRowStart, hourRowEnd })
     })
 
-    return <div className='w-[80vw]'>
-        <div className='flex w-fit m-auto mb-[1.7rem] items-center'>
-            <button className='mr-[1.5rem]' onClick={() => weekBackward()}>a</button>
-            <div className='text-[1.4vw] mb- font-bold m-auto w-fit'>{`${currentWeek.getDate()}-${currentWeek.getMonth() + 1}-${currentWeek.getYear() + 1900}`} / {`${currentWeekEnd.getDate()}-${currentWeekEnd.getMonth() + 1}-${currentWeekEnd.getYear() + 1900}`}</div>
-            <button className='ml-[1.5rem]' onClick={() => weekForward()}>b</button>
+    return <div className='w-[80vw] mb-[10rem]'>
+        <div className='flex w-[60%] m-auto mb-[1rem] items-center'>
+            <PageButton clickFunc={() => {otworzOkno(1)}} icon={"icon-calendar-plus-o"} optional={true}></PageButton>
+
+            <div className="flex w-fit m-auto items-center">
+                <button className='mr-[1.5rem]' onClick={() => weekBackward()}><i className="icon-down-open inline-block rotate-90"> </i></button>
+                <div className='text-[1.4vw] mb- font-bold m-auto w-fit'>{`${currentWeek.getDate()}-${currentWeek.getMonth() + 1}-${currentWeek.getYear() + 1900}`} / {`${currentWeekEnd.getDate()}-${currentWeekEnd.getMonth() + 1}-${currentWeekEnd.getYear() + 1900}`}</div>
+                <button className='ml-[1.5rem]' onClick={() => weekForward()}><i className="icon-down-open inline-block -rotate-90"></i></button>
+            </div>
+                <PageButton clickFunc={() => {otworzOkno(0)}} icon={"icon-plus"}></PageButton>
         </div>
         <div className={`w-[80%] pr-4 pt-2 pb-5 m-auto bg-white flex rounded-xl`} >
             <div className="m-auto ml-2">
@@ -107,8 +127,7 @@ const Scheduler = ({ harmonogram, zadania }) => {
                 <div className="grid" style={{ gridTemplateRows: rows }}>
                     {
                         hours.filter((h) => h%100==0).map((h) => {
-                            return <><div className="m-auto text-[0.6rem] text-black text-right" style={{ gridRow: `g${h}` }}>{`${Math.floor(h / 100)}:${(h % 100).toString().padStart(2, 0)}`}</div>
-                            </>
+                            return <div key={h} className="m-auto text-[0.6rem] text-black text-right" style={{ gridRow: `g${h}` }}>{`${Math.floor(h / 100)}:${(h % 100).toString().padStart(2, 0)}`}</div>
                             }
                         )
                     }
@@ -116,7 +135,7 @@ const Scheduler = ({ harmonogram, zadania }) => {
 
             </div>
             {days.map((day, index) =>
-                <div className="m-auto w-[100%]">
+                <div key={index} className="m-auto w-[100%]">
                     <div className="m-auto text-black text-center">
                         {day}
                     </div>
@@ -124,15 +143,13 @@ const Scheduler = ({ harmonogram, zadania }) => {
                         <div className="grid absolute inset-0 z-0" style={{ gridTemplateRows: rows }}>
                             {hours.map((h) => {
                                 const color = ((h - 45) % 100) ? (h == start) ? "border-t-gray-400 border-b-gray-300" : "border-b-gray-300" : "border-b-gray-400"
-                                return <>
-                                    <div style={{ gridRow: `g${h}`, }} class={`border border-dashed ${color}`}></div>
-                                </>
+                                return <div key={h} style={{ gridRow: `g${h}`, }} className={`border border-dashed ${color}`}></div>
                             }
                             )}
                         </div>
                         <div className="relative grid z-10" style={{ gridTemplateRows: rows }}>
                             {tasksForDays[index].map(entry => {
-                                return <div className="h-[98%] rounded-xl w-[98%] border border-red-400/50 m-auto text-xs text-black bg-red-300/70 flex item-center justify-center" style={{ gridRow: `${entry.hourRowStart} / ${entry.hourRowEnd}` }}><div className="h-fit m-auto">{entry.name}</div></div>
+                                return <div key={index+entry.name} className="h-[98%] rounded-xl w-[98%] border border-red-400/50 m-auto text-xs text-black bg-red-300/70 flex item-center justify-center" style={{ gridRow: `${entry.hourRowStart} / ${entry.hourRowEnd}` }}><div className="h-fit m-auto">{entry.name}</div></div>
                             }
                             )}
                         </div>

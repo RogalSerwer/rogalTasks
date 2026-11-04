@@ -4,24 +4,22 @@ import Login from './login/login.jsx'
 import './App.css'
 import './css/fontello.css'
 import { useCookies } from 'react-cookie'
-import { AppContext } from './utils/AppContext.jsx'
+import { useAppContext } from './utils/consts/AppContext.jsx'
+import { WindowProvider } from './utils/window/WindowContext.jsx'
+
 import rogal from '../assets/rogal.png';
-const backendLink = import.meta.env.VITE_BACKEND;
+
 function App() {
-  const [cookies, setCookie] = useCookies(['loginID']);
-  const login = (ID) => {
-    setCookie("loginID", ID)
-  }
-  const logout = () => {
-    setCookie("loginID", "")
-  }
+
+  const context = useAppContext();
   return <>
-    <AppContext.Provider value={{backendLink, userID: cookies.loginID, login, logout}}>
-      <div className='top-0px w-[100%] mx-auto my-[0.5vw] border-dashed border-b-3 border-[var(--color-accent)] rounded-[0.5vw]' id='logoContainer'>
-        <img className='my-[1vw] mx-auto w-[calc(13vh+3vw)] block' draggable={false} src={rogal}></img>
-      </div>
-      {cookies.loginID ? <Page /> : <Login />}
-    </AppContext.Provider>
+    <WindowProvider>
+      
+        <div className='top-0px w-[100%] mx-auto my-[0.5vw] border-dashed border-b-3 border-[var(--color-accent)] rounded-[0.5vw]' id='logoContainer'>
+          <img className='my-[1rem] mx-auto w-[calc(13vh+3vw)] block' draggable={false} src={rogal}></img>
+        </div>
+        {context.userID ? <Page /> : <Login />}
+    </WindowProvider>
   </>
 }
 

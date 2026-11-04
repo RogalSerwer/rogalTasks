@@ -28,5 +28,18 @@ if not tableFound:
 
 cursor.execute("SELECT * FROM migrations;")
 tables = cursor.fetchall()
-print(tables);
+tables = [table[0] for table in tables if table[1]]
+print(tables)
+parts = os.listdir("parts")
+print(parts)
+
+# Dodaj potem try/except
+
+for filename in parts:
+    num = int(filename[0:3])
+    if not num in tables:
+        with open(f"parts/{filename}", 'r') as f:
+            cursor.execute(f.read())
+            cursor.execute(f"INSERT INTO migrations (ID, applied) VALUES ({num}, 1)")
+mydb.commit()
 cursor.close()

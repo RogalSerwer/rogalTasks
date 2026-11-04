@@ -1,0 +1,1 @@
+ALTER TABLE `harmonogram` ADD `waga` INT NOT NULL DEFAULT '1' AFTER `nazwa`;

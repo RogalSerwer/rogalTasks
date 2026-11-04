@@ -24,13 +24,15 @@ const Zadanie = ({ zadanie, d, child, callback }) => {
 
     window.addEventListener('resize', updateDiv);
     const czas = getDateFormatted(data, child)
+    let parent = false;
     if (!child) {
         var children = JSON.parse(zadanie.children);
         children.sort(function (a, b) { return new Date(a["data"]) - new Date(b["data"])})
+        parent = JSON.parse(zadanie["children"])[0].ID != null;
     }
     const dateFormat = getLocalDate(data)
     let date = getLocalTimeToShow(data, child)        
-
+    
     useEffect(() => {
         updateDiv();
     }, [zadanie])
@@ -46,12 +48,12 @@ const Zadanie = ({ zadanie, d, child, callback }) => {
                             setData(date.toUTCString());
                         }} value={dateFormat}></input> : date}
                     </div>
-                    {(!child) && (<div className='progress-bar' style={{ height: "3px", backgroundColor: "#73603c", width: "90%", margin: "auto", marginTop: "2vh", marginBottom: "1vh" }}><div className='progress' style={{ height: "100%", position: "relative", top: "0", left: "0", backgroundColor: "#ddddb6", width: (zadanie["ratio"] + "%") }}></div></div>)}
+                    {(!child && parent) && (<div className='progress-bar' style={{ height: "3px", backgroundColor: "#73603c", width: "90%", margin: "auto", marginTop: "2vh", marginBottom: "1vh" }}><div className='progress' style={{ height: "100%", position: "relative", top: "0", left: "0", backgroundColor: "#ddddb6", width: (zadanie["ratio"] + "%") }}></div></div>)}
                 </div>
                 <div className='buttons'>
-                    {(!child && JSON.parse(zadanie["children"])[0].ID != null) && <TaskButton type='unwrap' fun={()=>{wysunZadania(zadanie["ID"])}} icon='icon-down-open' style={((wysuniete) ? { transform: "rotate(0deg)" } : { transform: "rotate(90deg)" })} ></TaskButton>}
-                    {((child || JSON.parse(zadanie["children"])[0].ID == null) && !editMode) && <TaskButton type="finished" fun={()=>{completeTask()}} icon='icon-ok' ></TaskButton>}
-                    {(editMode && (child || JSON.parse(zadanie["children"])[0].ID == null)) && <TaskButton type="removed" fun={()=>{removeTask()}} icon='icon-trash-empty'></TaskButton>}
+                    {(!child && parent) && <TaskButton type='unwrap' fun={()=>{wysunZadania(zadanie["ID"])}} icon='icon-down-open' style={((wysuniete) ? { transform: "rotate(0deg)" } : { transform: "rotate(90deg)" })} ></TaskButton>}
+                    {((child || !parent) && !editMode) && <TaskButton type="finished" fun={()=>{completeTask()}} icon='icon-ok' ></TaskButton>}
+                    {(editMode && (child || !parent)) && <TaskButton type="removed" fun={()=>{removeTask()}} icon='icon-trash-empty'></TaskButton>}
                     <TaskButton type='edit' fun={() => {toggleEditMode()}} icon='icon-edit'></TaskButton>
                 </div>
             </div>

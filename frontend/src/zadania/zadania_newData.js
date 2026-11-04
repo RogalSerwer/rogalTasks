@@ -1,11 +1,11 @@
 import { sendRequest } from "./zadania_service.js";
-import { useState, useContext } from "react"
-import { AppContext } from '../utils/AppContext.jsx'
+import { useState } from "react"
+import { useAppContext } from '../utils/consts/AppContext.jsx'
 export function onNewTaskInfo(blad, zamknijOkno, callback) {
     const currentTime = new Date();
     currentTime.setDate(currentTime.getDate() + 1)
-    const userID = useContext(AppContext).userID;
-    const backendLink = useContext(AppContext).backendLink;
+    const userID = useAppContext().userID;
+    const backendLink = useAppContext().backendLink;
     const [nazwa, setName] = useState("")
     const [rodzic, setParent] = useState("0")
     const [data, setDate] = useState(`${currentTime.getFullYear()}-${`${currentTime.getMonth() + 1}`.padStart(2, 0)}-${`${currentTime.getDate()}`.padStart(2, 0)}T12:00`)

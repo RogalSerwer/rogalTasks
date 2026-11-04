@@ -13,9 +13,9 @@ function UserViewTasks({ dane }) {
         <div style={{ marginBottom: "1vw" }}><input value={searchText} onChange={(e) => { setSearch(e.target.value) }} type='search' placeholder='Nakarm psa'></input></div>
         <table className='history' ><tbody><tr><th><button onClick={() => { sortType(0) }} className='inTable'>Nazwa</button></th><th><button className='inTable' onClick={() => { sortType(1) }}>Data</button></th><th><button className='inTable' onClick={() => { sortType(2) }}>Status</button></th></tr>
             {
-                dane.filter(e => e["nazwa"].toLowerCase().includes(searchText.toLowerCase())).sort(sorter).map(zadania => {
+                dane.filter(e => e["nazwa"].toLowerCase().includes(searchText.toLowerCase())).sort(sorter).map((zadania, i) => {
                     return (
-                        <tr><td>{zadania["nazwa"]}</td><td>{zadania["data"]}</td><td>{zadania['status']}</td></tr>
+                        <tr key={i}><td>{zadania["nazwa"]}</td><td>{zadania["data"]}</td><td>{zadania['status']}</td></tr>
                     )
                 })
             }
