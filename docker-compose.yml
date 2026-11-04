@@ -5,7 +5,7 @@ services:
       - "${FRONTEND_PORT}:3000"
     volumes:
       - ./frontend:/tasksFrontend
-      - /tasksFrontend/node_modules
+      - frontendModules:/tasksFrontend/node_modules
     command: sh -c "npm ci && npm run dev -- --host --port 3000"
     environment:
       - VITE_BACKEND=${BACKEND_URL}
@@ -56,3 +56,4 @@ services:
 volumes:
   tasksDB:
     name: tasksDB
+  frontendModules:
