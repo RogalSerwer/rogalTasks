@@ -1,3 +1,4 @@
 FROM node:22
 WORKDIR /tasksFrontend
-USER node
+RUN npm install
+CMD ["npm", "run", "dev", "--", "--host", "--port", "3000"]
