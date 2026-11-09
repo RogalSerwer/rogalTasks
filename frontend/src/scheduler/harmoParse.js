@@ -20,7 +20,6 @@ function HarmoDailyParser(entry, currentWeek, currentWeekEnd, start, numHours) {
                 startThisWeek = diff;
         }
         else if (start <= currentWeekEnd) {
-            console.log(entry);
             const s1 = new Date(entry.dni.date)
             const [year1, month1, day1] = getYMD(s1);
             const dateStart = new Date(year1, month1, day1);
@@ -30,6 +29,8 @@ function HarmoDailyParser(entry, currentWeek, currentWeekEnd, start, numHours) {
                 startThisWeek = (start.getDay() + 6) % 7;
         }
         else return;
+
+        if (startThisWeek>6) return;
         let days = [startThisWeek];
         while (days[days.length - 1] + interval < 7) days.push(days[days.length - 1] + interval);
         days.forEach((day) => {
