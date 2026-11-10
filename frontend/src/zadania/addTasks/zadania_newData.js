@@ -1,11 +1,12 @@
-import { sendRequest } from "./zadania_service.js";
+import { sendRequest } from "../zadania_service.js";
 import { useState } from "react"
-import { useAppContext } from '../utils/consts/AppContext.jsx'
+import { useAppContext } from '../../utils/consts/AppContext.jsx'
 export function onNewTaskInfo(blad, zamknijOkno, callback) {
     const currentTime = new Date();
     currentTime.setDate(currentTime.getDate() + 1)
     const userID = useAppContext().userID;
     const backendLink = useAppContext().backendLink;
+    const [waga, setWaga] = useState(1);
     const [nazwa, setName] = useState("")
     const [rodzic, setParent] = useState("0")
     const [data, setDate] = useState(`${currentTime.getFullYear()}-${`${currentTime.getMonth() + 1}`.padStart(2, 0)}-${`${currentTime.getDate()}`.padStart(2, 0)}T12:00`)
@@ -15,7 +16,7 @@ export function onNewTaskInfo(blad, zamknijOkno, callback) {
         let dataTemp = data;
         if (!dataNull) dataTemp = "NULL";
         const dane = {
-            nazwa, rodzic, dataTemp
+            nazwa, rodzic, dataTemp, waga
         }
         const response = await sendRequest(userID, backendLink, null, "POST", "noweZadanie", JSON.stringify(dane))
         if (response.status == 201 || response.status == 200) {
@@ -26,5 +27,5 @@ export function onNewTaskInfo(blad, zamknijOkno, callback) {
             blad(0);
     }
 
-    return {nazwa, setName, setParent, data, setDate, dataNull, setNoDate, onSubmit}
+    return {nazwa, setName, setParent, data, setDate, dataNull, setNoDate,  waga, setWaga, onSubmit}
 }

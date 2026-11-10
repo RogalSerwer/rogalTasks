@@ -14,7 +14,7 @@ export function useHarmonogramForm(harmonogram, zamknijOkno, blad, callback) {
     const intervalModeMap = [{ nazwa: "Dni", type: "daily", val: "0" }, { nazwa: "Tygodnie", type: "weekly", val: "1" }];
     const [reset, resetThisSH] = useState(false);
     const [dniTygodnia, setDniTygodnia] = useState([new Dzien({ nazwa: "Poniedziałek" }), new Dzien({ nazwa: "Wtorek" }), new Dzien({ nazwa: "Środa" }), new Dzien({ nazwa: "Czwartek" }), new Dzien({ nazwa: "Piątek" }), new Dzien({ nazwa: "Sobota" }), new Dzien({ nazwa: "Niedziela" })]);
-    const defaultHarmo = { nazwa: "Nazwa", dni: [] };
+    const defaultHarmo = { nazwa: "Nazwa", dni: [], waga: 1 };
     const updateDni = (id, changes) => {
         setDniTygodnia(prev =>
             prev.map(dni =>
@@ -75,7 +75,8 @@ export function useHarmonogramForm(harmonogram, zamknijOkno, blad, callback) {
                 payload: {
                     nazwa: "",
                     H: id,
-                    HID: e
+                    HID: e,
+                    waga: 0
                 }
             })
             if (harmonogram[id].dni.type == "daily")
@@ -90,7 +91,8 @@ export function useHarmonogramForm(harmonogram, zamknijOkno, blad, callback) {
                 payload: {
                     nazwa: "",
                     H: e,
-                    HID: e
+                    HID: e,
+                    waga: 0
                 }
             })
         }

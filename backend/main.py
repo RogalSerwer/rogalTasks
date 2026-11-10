@@ -39,7 +39,7 @@ def get_tasks(ID, DATE):
 
     # Skomplikowany kod SQL ktory pobiera zadania, przypisuje im dzieci i oblicza sredni stopien wykonania dla grupy
     cursor.execute(
-        f"SELECT parents.*, JSON_ARRAYAGG(JSON_OBJECT('ID', children.ID, 'nazwa', children.nazwa, 'status', children.status, 'data', CONCAT(DATE_FORMAT(CONVERT_TZ(children.data, '{timezone}', '+00:00'), '%a, %d %b %Y %H:%i:%s'),' GMT'))) AS children, ratio.r AS ratio FROM (SELECT * FROM zadania WHERE status!=100) AS parents LEFT JOIN (SELECT * FROM zadania WHERE status!=100) AS children ON parents.ID=children.parentID LEFT JOIN (SELECT parentID,  SUM(status)/(COUNT(status)) AS r FROM zadania GROUP BY parentID HAVING parentID!=0) AS ratio ON ratio.parentID=parents.ID  WHERE parents.uzytkownik={ID} GROUP BY ID {where}ORDER BY data ASC, ID ASC;"
+        f"SELECT parents.*, JSON_ARRAYAGG(JSON_OBJECT('ID', children.ID, 'nazwa', children.nazwa, 'waga', children.waga, 'status', children.status, 'data', CONCAT(DATE_FORMAT(CONVERT_TZ(children.data, '{timezone}', '+00:00'), '%a, %d %b %Y %H:%i:%s'),' GMT'))) AS children, ratio.r AS ratio FROM (SELECT * FROM zadania WHERE status!=100) AS parents LEFT JOIN (SELECT * FROM zadania WHERE status!=100) AS children ON parents.ID=children.parentID LEFT JOIN (SELECT parentID,  SUM(status)/(COUNT(status)) AS r FROM zadania GROUP BY parentID HAVING parentID!=0) AS ratio ON ratio.parentID=parents.ID  WHERE parents.uzytkownik={ID} GROUP BY ID {where}ORDER BY data ASC, ID ASC;"
     )
 
     temp = cursor.fetchall()
@@ -56,16 +56,17 @@ def addTask(USER):
     nazwa = request.json.get("nazwa")
     data = request.json.get("dataTemp")
     rodzic = request.json.get("rodzic")
+    waga = request.json.get("waga", 1)
     print(nazwa, data, rodzic)
     if nazwa and data and rodzic:
         cursor = mysql.connection.cursor()
         if data != "NULL":
             cursor.execute(
-                f"INSERT INTO zadania (status, uzytkownik, nazwa, data, parentID) VALUES (0, {USER}, '{nazwa}', '{data}', {rodzic})"
+                f"INSERT INTO zadania (status, uzytkownik, nazwa, data, parentID, waga) VALUES (0, {USER}, '{nazwa}', '{data}', {rodzic}, {waga})"
             )
         else:
             cursor.execute(
-                f"INSERT INTO zadania (status, uzytkownik, nazwa, data, parentID) VALUES (0, {USER}, '{nazwa}', {data}, {rodzic})"
+                f"INSERT INTO zadania (status, uzytkownik, nazwa, data, parentID, waga) VALUES (0, {USER}, '{nazwa}', {data}, {rodzic}, {waga})"
             )
         mysql.connection.commit()
         cursor.close()
@@ -132,6 +133,7 @@ def wyslijHarmo(ID):
 @app.route("/harmonogramCreate/<int:IDuser>", methods=["POST"])
 def noweHarmo(IDuser):
     nazwa = request.json.get("nazwa")
+    waga = request.json.get("waga",1)
     dni = request.json.get("dniD")
     if "'" in str(dni):
         dni = json.dumps(dni)
@@ -141,12 +143,12 @@ def noweHarmo(IDuser):
         print(dni)
         if not checkIfLateAdder(temp):
             cursor.execute(
-                f"INSERT INTO harmonogram (nazwa, dni, uzytkownik) VALUES (%s, %s,{IDuser})",
+                f"INSERT INTO harmonogram (nazwa, dni, uzytkownik, waga) VALUES (%s, %s,{IDuser}, {waga})",
                 (nazwa, dni),
             )
         else:
             cursor.execute(
-                f"INSERT INTO harmonogram (nazwa, dni, uzytkownik, lastAdded) VALUES (%s, %s,{IDuser}, %s)",
+                f"INSERT INTO harmonogram (nazwa, dni, uzytkownik, lastAdded, waga) VALUES (%s, %s,{IDuser}, %s, {waga})",
                 (nazwa, dni, temp["date"]),
             )
         mysql.connection.commit()
@@ -170,13 +172,14 @@ def checkIfLateAdder(dni):
 def edytujHarmo(ID):
     nazwa = request.json.get("nazwa")
     dni = request.json.get("dniD")
+    waga = request.json.get("waga",1)
     print(list(dni.keys()))
     if "'" in str(dni):
         dni = json.dumps(dni)
     if ID:
         cursor = mysql.connection.cursor()
         cursor.execute(
-            f"UPDATE harmonogram SET nazwa=%s, dni=%s WHERE ID={ID}", (nazwa, dni)
+            f"UPDATE harmonogram SET nazwa=%s, dni=%s, waga={waga} WHERE ID={ID}", (nazwa, dni)
         )
         mysql.connection.commit()
         cursor.close()
@@ -265,12 +268,20 @@ def removeUser(ID):
 
 @app.route("/updateTaskInfo/<int:ID>", methods=["PATCH"])
 def updateInfoTask(ID):
-    data = request.json.get("data")
-    data = datetime.fromisoformat(data.replace("Z", "+00:00")).astimezone(ZoneInfo("Europe/Warsaw"))
-    data = data.strftime("%Y-%m-%d %H:%M:%S")
+    data = request.json.get("data", None)
+    if data is not None:
+        data = datetime.fromisoformat(data.replace("Z", "+00:00")).astimezone(ZoneInfo("Europe/Warsaw"))
+        data = data.strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        data = "NULL"
     nazwa = request.json.get("nazwa")
+    waga = request.json.get("waga")
     cursor = mysql.connection.cursor()
-    cursor.execute(f"UPDATE zadania SET nazwa='{nazwa}', data='{data}' WHERE ID={ID};")
+    if data=="NULL":
+        data = "data=NULL"
+    else:
+        data=f"data='{data}'"
+    cursor.execute(f"UPDATE zadania SET nazwa='{nazwa}', {data}, waga='{waga}' WHERE ID={ID};")
     mysql.connection.commit()
     cursor.close()
     return jsonify({"wynik": "Zaktualizowano zadanie!"}), 213

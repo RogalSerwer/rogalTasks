@@ -8,8 +8,13 @@ export function getDateFormatted(data, child) {
 
 export function getLocalDate(data)
 {
-    const localDate = new Date(data);
-    return `${localDate.getFullYear()}-${`${localDate.getMonth() + 1}`.padStart(2, 0)}-${`${localDate.getDate()}`.padStart(2, 0)}T${`${localDate.getHours()}`.padStart(2, 0)}:${`${localDate.getMinutes()}`.padStart(2, 0)}`
+    if (data!=null)
+    {
+        const localDate = new Date(data);
+        return `${localDate.getFullYear()}-${`${localDate.getMonth() + 1}`.padStart(2, 0)}-${`${localDate.getDate()}`.padStart(2, 0)}T${`${localDate.getHours()}`.padStart(2, 0)}:${`${localDate.getMinutes()}`.padStart(2, 0)}`
+    }
+    else return "";
+
 }
 
 export function getLocalTimeToShow(data, child) {

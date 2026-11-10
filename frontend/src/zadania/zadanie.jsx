@@ -3,13 +3,17 @@ import { useRequestActions } from './zadania_service';
 import { getAutoHeight, useCSSAnimation } from './zadania_css';
 import { getDateFormatted, getLocalDate, getLocalTimeToShow } from './zadania_time';
 import TaskButton from './buttons/taskButton';
+import PriorityBar from './taskElements/priority';
 
 const Zadanie = ({ zadanie, d, child, callback }) => {
 
-    const [editMode, setEditMode] = useState(false);
     const [wysuniete, setWysuniete] = useState(false);
+    // Na pozniej - hook dla editow
+    const [editMode, setEditMode] = useState(false);
     const [nazwa, setNazwa] = useState(zadanie['nazwa'])
     const [data, setData] = useState(zadanie['data']);
+    const [starLevel, setStarLevel] = useState(zadanie['waga']);
+
     const { checkChildrenHeight, applyCSS, updateDiv } = useCSSAnimation(wysuniete, child, zadanie["ID"])
     const { removeTask, completeTask, updateTaskInfo } = useRequestActions(zadanie["ID"], callback, applyCSS)
     const wysunZadania = () => {
@@ -18,7 +22,7 @@ const Zadanie = ({ zadanie, d, child, callback }) => {
         setWysuniete(!wysuniete);
     }
     const toggleEditMode = () => {
-        if (editMode) updateTaskInfo(nazwa, data);
+        if (editMode) updateTaskInfo(nazwa, data, starLevel);
         setEditMode(!editMode)
     }
 
@@ -31,24 +35,24 @@ const Zadanie = ({ zadanie, d, child, callback }) => {
         parent = JSON.parse(zadanie["children"])[0].ID != null;
     }
     const dateFormat = getLocalDate(data)
-    let date = getLocalTimeToShow(data, child)        
+    let date = getLocalTimeToShow(data, child)    
     
     useEffect(() => {
         updateDiv();
     }, [zadanie])
-
     return (
         <div className='mainTaskContainer'>
             <div keyprop={zadanie["ID"]} className={(child) ? 'taskRowChild' : 'taskRow'} style={(czas.getTime() - d.getTime() <= 0) ? { backgroundColor: "rgb(123, 122, 117)" } : ((d.getYear() == czas.getYear() && d.getMonth() == czas.getMonth() && d.getDate() == czas.getDate()) ? { backgroundColor: "#9f1818" } : {})} data-id={zadanie["ID"]}>
+                <PriorityBar editMode={editMode} starLevel={starLevel} setStarLevel={setStarLevel}></PriorityBar>
                 <div className='taskContentWrapper'>
-                    {(editMode) ? (<div className='text-[calc(1.0vw+2vh)] ml-[3vw] font-bold'><input onChange={(e) => { setNazwa(e.target.value) }} size={nazwa.length} className='nameChangeInput' type='text' value={nazwa}></input></div>) : (<div className='text-[calc(1.0vw+2vh)] ml-[3vw] font-bold'>{nazwa}</div>)}
-                    <div className='ml-[5vw] text-[calc(0.4vw+1.4vh)]'>
+                    {(editMode) ? (<div className='text-[calc(1.0vw+2vh)] ml-[1.5vw] font-bold'><input onChange={(e) => { setNazwa(e.target.value) }} size={nazwa.length} className='nameChangeInput' type='text' value={nazwa}></input></div>) : (<div className='text-[calc(1.0vw+2vh)] ml-[1.5vw] font-bold'>{nazwa}</div>)}
+                    <div className='ml-[1.5vw] text-[calc(0.4vw+1.4vh)]'>
                         {editMode ? <input type='datetime-local' onChange={(e) => {
                             const date = new Date(e.target.value);
                             setData(date.toUTCString());
                         }} value={dateFormat}></input> : date}
                     </div>
-                    {(!child && parent) && (<div className='progress-bar' style={{ height: "3px", backgroundColor: "#73603c", width: "90%", margin: "auto", marginTop: "2vh", marginBottom: "1vh" }}><div className='progress' style={{ height: "100%", position: "relative", top: "0", left: "0", backgroundColor: "#ddddb6", width: (zadanie["ratio"] + "%") }}></div></div>)}
+                    {(!child && parent) && (<div style={{ height: "3px", backgroundColor: "#73603c", width: "90%", margin: "auto", marginTop: "2vh", marginBottom: "1vh" }}><div className='progress' style={{ height: "100%", position: "relative", top: "0", left: "0", backgroundColor: "#ddddb6", width: (zadanie["ratio"] + "%") }}></div></div>)}
                 </div>
                 <div className='buttons'>
                     {(!child && parent) && <TaskButton type='unwrap' fun={()=>{wysunZadania(zadanie["ID"])}} icon='icon-down-open' style={((wysuniete) ? { transform: "rotate(0deg)" } : { transform: "rotate(90deg)" })} ></TaskButton>}

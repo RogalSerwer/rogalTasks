@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useWindowContext } from '../utils/window/WindowContext.jsx'
 import ZadaniaLista from "../zadania/zadania.jsx"
-import ZadForm from "../zadania/noweZadania.jsx"
+import ZadForm from "../zadania/addTasks/noweZadania.jsx"
 import Harmonogram from "../harmonogram/harmonogram.jsx"
 import UserConfig from "../user/user.jsx"
 import { useFetchedData } from './page_data.js'

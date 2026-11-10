@@ -1,7 +1,9 @@
 import { useState } from "react"
 import { onNewTaskInfo } from "./zadania_newData"
-import ErrorBar from "../utils/errorBar"
-import HeaderText from "../utils/headerText"
+import ErrorBar from "../../utils/errorBar"
+import HeaderText from "../../utils/headerText"
+import { range } from "../../utils/js/range"
+import IconButton from "../../utils/iconButton";
 
 const ZadForm = ({ zadania, zamknijOkno, blad, callback, }) => {
 
@@ -28,6 +30,15 @@ const ZadForm = ({ zadania, zamknijOkno, blad, callback, }) => {
 
         </div>
         <input disabled={!formData.dataNull} type="datetime-local" id="formData" value={formData.dataNull ? formData.data : ''} onChange={(e) => formData.setDate(String(e.target.value))} />
+        <div className="pb-4">
+            <div className="items-center w-fit mx-auto px-4">
+                <label className="block m-auto" htmlFor="formData">Waga</label>
+                    {range(1,5).map(star => {
+                        return <IconButton type={"button"} onClick={() => formData.setWaga(star)} className={`!text-4xl ${formData.waga>=star ? "text-yellow-500" :'text-mauve-600'}`}>★</IconButton>
+                    })}
+            </div>
+
+        </div>
         <button type='submit' >Dodaj zadanie</button>
     </form>
 }
