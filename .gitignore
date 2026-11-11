@@ -3,7 +3,6 @@ backend/output.txt
 venv/
 backend/__pycache__/
 backend/output.log
-backend/firebase.json
 frontend/output.log
 frontend/package-lock.json
 frontend/package-lock.json
@@ -11,3 +10,6 @@ backend/tests/.~lock.test_daily.ods#
 .vscode
 backend/output.log
 .env
+firebase.json
+*.pyc
+__pycache__

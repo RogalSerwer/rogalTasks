@@ -23,6 +23,7 @@ sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin dock
 
 echo "Setting up the environment"
 
+cd "$(dirname "$0")"
 mkdir -p "$HOME/.config/rogaltasks/main"
 chmod 700 "$HOME/.config/rogaltasks/main"
 read -p "Enter database user name (leave blank for default - rogal) " db_user
@@ -42,10 +43,18 @@ else
     read -p "Enter backend port (leave blank for default - 5000) " backendPort
     backendPort="${backendPort:-5000}"
 fi
+
+read -p "Paste your Discord bot token here (leave blank if you have none): " discord
+
+read -p "Enter the firebase.json file location (leave blank if you have none) " firebase
+if [[ -n $firebase ]]; then
+    echo "Copying the firebase file to the scheduler location..."
+    cp $firebase scheduler/firebase.json
+fi
 frontendPort="${frontendPort:-3000}"
 db_user="${db_user:-rogal}"
 database="${database:-tasks}"
-
+disord="${database:-None}"
 echo "Saving environment data"
 
 cat <<EOM >"$HOME/.config/rogaltasks/main/.env"
@@ -55,4 +64,5 @@ DATABASE=$database
 BACKEND_URL=$url
 BACKEND_PORT=$backendPort
 FRONTEND_PORT=$frontendPort
+DISCORD=$discord
 EOM
