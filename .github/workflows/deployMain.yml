@@ -14,7 +14,7 @@ jobs:
           path: main
       - name: Teardown
         working-directory: main
-        run: ./teardown.sh
+        run: ./teardown.sh prod
       - name: Deploy Docker
         working-directory: main
-        run: ./deploy.sh
+        run: ./deploy.sh prod
