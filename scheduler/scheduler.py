@@ -4,13 +4,15 @@ import logging
 import firebase_admin
 from firebase_admin import credentials
 import os
+import json
 
 logging.basicConfig(level=logging.DEBUG, format="[%(asctime)s] %(levelname)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
 logger = logging.getLogger(__name__)
 scheduler = BlockingScheduler(timezone="Europe/Warsaw")
 android = False
-if os.path.exists("firebase.json"):
-    cred = credentials.Certificate("firebase.json")
+if os.getenv("FIREBASE")!="":
+    firebase = json.loads(os.getenv("FIREBASE"))
+    cred = credentials.Certificate(firebase)
     firebase_admin.initialize_app(cred)
     android = True
     logger.info("Proceeding with Android notification functionality")

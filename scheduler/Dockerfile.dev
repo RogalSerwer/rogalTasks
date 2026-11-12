@@ -3,4 +3,6 @@ WORKDIR /tasksSchedule
 COPY requirements.txt ./
 RUN apt update && apt install -y default-libmysqlclient-dev build-essential pkg-config
 RUN pip install -r requirements.txt
+ARG FIREBASE
+RUN if [ -n $FIREBASE] && [-r $FIREBASE ]; then cp $FIREBASE ./; fi
 CMD ["python3", "scheduler.py"]

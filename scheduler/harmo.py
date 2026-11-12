@@ -77,7 +77,7 @@ def update(android=False):
 
         mydb.commit()
 
-    if TOKEN!="Null" or android:
+    if (TOKEN!="nuller" and TOKEN!="") or android:
         mycursor.execute("SELECT ID, ilePowiadomien, discord, androidToken FROM uzytkownicy;")
         userData = mycursor.fetchall()
         messageMap = {}
@@ -133,7 +133,7 @@ def update(android=False):
 
         for key, val in messageMap.items():
             # Wysylanie zapisanych wiadomosci przez bota
-            if val[0] != 0 and TOKEN!="Null":
+            if val[0] != 0 and TOKEN!="nuller" and TOKEN!="":
                 intents = discord.Intents.default()
                 intents.message_content = True
                 intents.members = True

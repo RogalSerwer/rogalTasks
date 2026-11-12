@@ -15,6 +15,7 @@ services:
     depends_on:
       backend:
         condition: service_started
+    restart: unless-stopped
 
   backend:
     build: 
@@ -33,6 +34,7 @@ services:
     depends_on:
       migration:
         condition: service_completed_successfully
+    restart: unless-stopped
   scheduler:
     build:
       context: ./scheduler
@@ -45,10 +47,12 @@ services:
       - PASSWORD=${PASSWORD}
       - DATABASE=${DATABASE}
       - DISCORD=${DISCORD}
+      - FIREBASE=${FIREBASE}
       - TZ=Europe/Warsaw
     depends_on:
       backend:
         condition: service_started
+    restart: unless-stopped
 
   db:
     image: mariadb:11.8
@@ -63,7 +67,13 @@ services:
     volumes:
       - tasksDB:/var/lib/mysql
       - ./migration/db_init.sql:/docker-entrypoint-initdb.d/init.sql
-
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
   migration:
     build:
       context: ./migration
@@ -78,9 +88,8 @@ services:
       - TZ=Europe/Warsaw
     depends_on:
       db:
-        condition: service_started
+        condition: service_healthy
     restart: "no"
-
 volumes:
   tasksDB:
     name: tasksDB

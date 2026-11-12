@@ -1,13 +1,17 @@
 #!/bin/bash
 
 cd "$(dirname "$0")"
-file="$HOME/.config/rogaltasks/main/.env"
+file="$HOME/.config/rogaltasks/dev/.env"
+composefile="./docker-compose.dev.yml"
+name="rogalTasks-dev"
+if [ "$1" = "prod" ]; then
+    file="$HOME/.config/rogaltasks/main/.env"
+    composefile="./docker-compose.main.yml"
+    name="rogalTasks-main"
+fi
+
 if [ -r $file ]; then
-    if [ "$1" = "prod" ]; then
-        docker compose --env-file $file -f ./docker-compose.prod.yml up -d --build --force-recreate
-    else
-        docker compose --env-file $file -f ./docker-compose.dev.yml up -d --build --force-recreate
-    fi
+    docker compose -p $name --env-file $file -f $composefile up -d --build --force-recreate
 else
     echo "The environment file doesn't exist - please run the installation script."
     exit 1
