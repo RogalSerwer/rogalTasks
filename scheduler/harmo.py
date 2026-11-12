@@ -34,15 +34,16 @@ def update(android=False):
 
 
     # Przetwarzanie danych z harmonogramu tylko o 3 rano
-    if CURRENT.strftime("%H") == "03":
+    if CURRENT.strftime("%H") == "3":
         mycursor.execute("SELECT * FROM harmonogram;")
         harmoData = mycursor.fetchall()
         for row in harmoData:
             name = row[1]
-            dni = json.loads(row[2])
-            user = row[3]
+            dni = json.loads(row[3])
+            user = row[4]
+            waga = row[2]
             id = row[0]
-            lastAdded = f"{row[5]:%Y-%m-%d}"
+            lastAdded = f"{row[6]:%Y-%m-%d}"
             if dni["type"] == "daily":
                 if dailyDniParse(CURRENT, dni, lastAdded):
                     dailyDniUpdate(dni, name, user)
@@ -64,7 +65,7 @@ def update(android=False):
                                 godzina = f"{day['hour']:02d}:{day['minute']:02d}"
                                 date = f"{CURRENT:%Y-%m-%d} {godzina}"
                                 nazwa = f"{name} - {date}"
-                                sql = f"INSERT INTO zadania (status, data, nazwa, parentID, uzytkownik) VALUES (0, '{date}', '{nazwa}', 0, {user});"
+                                sql = f"INSERT INTO zadania (status, data, nazwa, parentID, uzytkownik, waga) VALUES (0, '{date}', '{nazwa}', 0, {user}, {waga});"
                                 mycursor.execute(sql)
                         if dayID == days[0]:
                             date = CURRENT - datetime.timedelta(days=CURRENT.weekday())

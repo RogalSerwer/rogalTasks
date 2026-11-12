@@ -7,6 +7,8 @@ services:
         VITE_BACKEND: ${BACKEND_URL}
     ports:
       - "${FRONTEND_PORT}:3000"
+    environment:
+      - TZ=Europe/Warsaw
     depends_on:
       backend:
         condition: service_started
@@ -21,6 +23,7 @@ services:
       - DB_USER=${DB_USER}
       - PASSWORD=${PASSWORD}
       - DATABASE=${DATABASE}
+      - TZ=Europe/Warsaw
     depends_on:
       migration:
         condition: service_completed_successfully
@@ -33,6 +36,7 @@ services:
       - PASSWORD=${PASSWORD}
       - DATABASE=${DATABASE}
       - DISCORD=${DISCORD}
+      - TZ=Europe/Warsaw
     depends_on:
       backend:
         condition: service_started
@@ -40,10 +44,11 @@ services:
   db:
     image: mariadb:11.8
     environment:
-      MARIADB_ROOT_PASSWORD: "${PASSWORD}"
-      MARIADB_DATABASE: "${DATABASE}"
-      MARIADB_USER: "${DB_USER}"
-      MARIADB_PASSWORD: "${PASSWORD}"
+      - MARIADB_DATABASE="${DATABASE}"
+      - MARIADB_ROOT_PASSWORD="${PASSWORD}"
+      - MARIADB_PASSWORD="${PASSWORD}"
+      - MARIADB_USER="${DB_USER}"
+      - TZ=Europe/Warsaw
     ports:
      - "3386:3306"
     volumes:
@@ -58,6 +63,7 @@ services:
       - DB_USER=${DB_USER}
       - PASSWORD=${PASSWORD}
       - DATABASE=${DATABASE}
+      - TZ=Europe/Warsaw
     depends_on:
       db:
         condition: service_started

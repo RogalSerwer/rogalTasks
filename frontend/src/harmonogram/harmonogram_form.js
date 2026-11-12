@@ -108,6 +108,8 @@ export function useHarmonogramForm(harmonogram, zamknijOkno, blad, callback) {
         else {
             if (infoState.nazwa == "")
                 dane.nazwa = harmonogram[infoState.currentH].nazwa
+            if (infoState.waga == 0)
+                dane.waga = harmonogram[infoState.currentH].waga
             status = await editHarmonogram(backendLink, infoState.currentHID, dane)
         }
         if (status < 400) closeWindow()
