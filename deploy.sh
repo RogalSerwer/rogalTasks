@@ -6,7 +6,7 @@ composefile="./docker-compose.dev.yml"
 name="rogaltasks-dev"
 if [ "$1" = "prod" ]; then
     file="$HOME/.config/rogaltasks/main/.env"
-    composefile="./docker-compose.main.yml"
+    composefile="./docker-compose.prod.yml"
     name="rogaltasks-main"
 fi
 
