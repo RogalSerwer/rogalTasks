@@ -53,11 +53,11 @@ services:
   db:
     image: mariadb:11.8
     environment:
-      - MARIADB_DATABASE="${DATABASE}"
-      - MARIADB_ROOT_PASSWORD="${PASSWORD}"
-      - MARIADB_PASSWORD="${PASSWORD}"
-      - MARIADB_USER="${DB_USER}"
-      - TZ=Europe/Warsaw
+      MARIADB_DATABASE: "${DATABASE}"
+      MARIADB_ROOT_PASSWORD: "${PASSWORD}"
+      MARIADB_PASSWORD: "${PASSWORD}"
+      MARIADB_USER: "${DB_USER}"
+      TZ: Europe/Warsaw
     ports:
      - "3366:3306"
     volumes:
