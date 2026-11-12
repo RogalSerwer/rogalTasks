@@ -62,10 +62,10 @@ services:
       context: ./migration
       dockerfile: Dockerfile.prod
     environment:
-      - PYTHONDONTWRITEBYTECODE=1
       - DB_USER=${DB_USER}
       - PASSWORD=${PASSWORD}
       - DATABASE=${DATABASE}
+      - PYTHONDONTWRITEBYTECODE=1
       - TZ=Europe/Warsaw
     depends_on:
       db:
