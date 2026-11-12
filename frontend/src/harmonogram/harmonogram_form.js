@@ -1,20 +1,20 @@
-import { useState, useEffect, useReducer, useContext } from "react"
+import { useState, useEffect, useReducer } from "react"
 import { removeHarmonogram, createHarmonogram, editHarmonogram, prepareDataToSubmit } from './harmonogram_service.js'
 import { Dzien, findIDOfE } from "./harmonogram_helpers.js"
 import { infoStateReducer, initialInfoState } from "./harmonogram_infoState.js"
 import { dayStateReducer, initialDayState } from "./harmonogram_dayState.js"
-import { AppContext } from '../utils/AppContext.jsx'
+import { useAppContext } from '../utils/consts/AppContext.jsx'
 
 export function useHarmonogramForm(harmonogram, zamknijOkno, blad, callback) {
 
-    const backendLink = useContext(AppContext).backendLink;
-    const userID = useContext(AppContext).userID;
+    const backendLink = useAppContext().backendLink;
+    const userID = useAppContext().userID;
     const [infoState, dispatchInfo] = useReducer(infoStateReducer, initialInfoState)
     const [dayState, dispatchDay] = useReducer(dayStateReducer, initialDayState)
     const intervalModeMap = [{ nazwa: "Dni", type: "daily", val: "0" }, { nazwa: "Tygodnie", type: "weekly", val: "1" }];
     const [reset, resetThisSH] = useState(false);
     const [dniTygodnia, setDniTygodnia] = useState([new Dzien({ nazwa: "Poniedziałek" }), new Dzien({ nazwa: "Wtorek" }), new Dzien({ nazwa: "Środa" }), new Dzien({ nazwa: "Czwartek" }), new Dzien({ nazwa: "Piątek" }), new Dzien({ nazwa: "Sobota" }), new Dzien({ nazwa: "Niedziela" })]);
-    const defaultHarmo = { nazwa: "Nazwa", dni: [] };
+    const defaultHarmo = { nazwa: "Nazwa", dni: [], waga: 1 };
     const updateDni = (id, changes) => {
         setDniTygodnia(prev =>
             prev.map(dni =>
@@ -75,7 +75,8 @@ export function useHarmonogramForm(harmonogram, zamknijOkno, blad, callback) {
                 payload: {
                     nazwa: "",
                     H: id,
-                    HID: e
+                    HID: e,
+                    waga: 0
                 }
             })
             if (harmonogram[id].dni.type == "daily")
@@ -90,7 +91,8 @@ export function useHarmonogramForm(harmonogram, zamknijOkno, blad, callback) {
                 payload: {
                     nazwa: "",
                     H: e,
-                    HID: e
+                    HID: e,
+                    waga: 0
                 }
             })
         }
@@ -106,6 +108,8 @@ export function useHarmonogramForm(harmonogram, zamknijOkno, blad, callback) {
         else {
             if (infoState.nazwa == "")
                 dane.nazwa = harmonogram[infoState.currentH].nazwa
+            if (infoState.waga == 0)
+                dane.waga = harmonogram[infoState.currentH].waga
             status = await editHarmonogram(backendLink, infoState.currentHID, dane)
         }
         if (status < 400) closeWindow()

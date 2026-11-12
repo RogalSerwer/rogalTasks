@@ -1,6 +1,5 @@
 // Zrobic z tego potem metode ogolnodostepna, razem z tym co jest zadaniach
-import { AppContext } from '../utils/AppContext.jsx'
-import { useContext } from 'react'
+import { useAppContext } from '../utils/consts/AppContext.jsx'
 
 async function sendRequest(id, backendLink, callback, method, endpoint, body = null)
 {
@@ -21,9 +20,9 @@ async function sendRequest(id, backendLink, callback, method, endpoint, body = n
 
 export function userManager(zamknijOkno, callback) {
 
-    const backendLink = useContext(AppContext).backendLink;
-    const id = useContext(AppContext).userID;
-    const logout = useContext(AppContext).logout;
+    const backendLink = useAppContext().backendLink;
+    const id = useAppContext().userID;
+    const logout = useAppContext().logout;
 
     const removeAcc = async () =>
     {

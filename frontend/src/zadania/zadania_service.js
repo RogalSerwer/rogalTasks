@@ -1,5 +1,4 @@
-import { AppContext } from '../utils/AppContext.jsx'
-import { useContext } from 'react'
+import { useAppContext } from '../utils/consts/AppContext.jsx'
 
 export async function sendRequest(id, backendLink, callback, method, endpoint, body = null)
 {
@@ -22,7 +21,7 @@ export async function sendRequest(id, backendLink, callback, method, endpoint, b
 
 // To nie jest do konca hook, ale może w przyszlosci cos sie doda
 export function useRequestActions(id, callback, applyCSS) {
-    const backendLink = useContext(AppContext).backendLink;
+    const backendLink = useAppContext().backendLink;
     const removeTask = async () => {
         applyCSS();
         sendRequest(id, backendLink, callback, "DELETE", "usunZadanie")
@@ -31,9 +30,13 @@ export function useRequestActions(id, callback, applyCSS) {
         applyCSS();
         sendRequest(id, backendLink, callback, "PATCH", "wykonajZadanie")
     }
-    const updateTaskInfo = async (nazwa, data) => {
+    const updateTaskInfo = async (nazwa, data, star) => {
+
+        let date = null;
+        if (data!="" && data!=null)
+            date = new Date(data).toISOString()
         const dane = {
-            nazwa, data
+            nazwa, data: date, waga: star
         }
         sendRequest(id, backendLink, null, "PATCH", "updateTaskInfo", JSON.stringify(dane))
     }

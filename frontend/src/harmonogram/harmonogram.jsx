@@ -1,20 +1,19 @@
 import {useState, useEffect} from "react"
-import Scheduler from '../scheduler.jsx'
-import { removeHarmonogram, createHarmonogram, editHarmonogram } from './harmonogram_service.js'
-import { parseDniDay, parseDniWeek } from "./harmonogram_mapper.js"
 import { useHarmonogramForm } from "./harmonogram_form.js"
 import HarmonogramWeek from "./harmonogramWeeks.jsx"
 import HarmonogramDay from "./harmonogramDays.jsx"
 import ErrorBar from "../utils/errorBar.jsx"
 import HeaderText from "../utils/headerText.jsx"
+import IconButton from "../utils/iconButton";
+import { range } from "../utils/js/range.js"
 
 const Harmonogram = ({harmonogram, zamknijOkno, blad, callback}) => {
 
+    
     const form = useHarmonogramForm(harmonogram, zamknijOkno, blad, callback)
     useEffect(()=>{
 
     },[form.reset])
-
     return <form onSubmit={form.onSubmit}>
             <HeaderText>Harmonogram</HeaderText>
              <select id='aktywnosc' onChange={(e) => form.setH(e.target.value)} value={form.infoState.currentHID} selected="new">
@@ -33,6 +32,14 @@ const Harmonogram = ({harmonogram, zamknijOkno, blad, callback}) => {
                  ))}
              </select>
              <input id='intervalVal' type='number' value={form.dayState.intervalVal} onChange={(e) => form.dispatchDay({type:"INTERVAL_VAL", payload: e.target.value})} min='1'></input>
+             <h2>Waga</h2>
+             <div className="flex text-4xl">
+                {range(1,5).map(star => {
+                    return <IconButton type={"button"} onClick={() => form.dispatchInfo({type: "PRIORITY_CHANGE", payload: star})} className={
+        
+                        (form.infoState.waga!=0 && form.infoState.waga>=star) || (form.infoState.waga==0 && form.selectedH.waga>=star ) ? "text-yellow-500" :'text-mauve-600'}>★</IconButton>
+                })}
+            </div>
             {form.dayState.intervalMode==0&&
                 <HarmonogramDay form={form}></HarmonogramDay>
             }

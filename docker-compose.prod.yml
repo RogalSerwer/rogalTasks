@@ -1,0 +1,86 @@
+services:
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_BACKEND: ${BACKEND_URL}
+    ports:
+      - "${FRONTEND_PORT}:3000"
+    environment:
+      - TZ=Europe/Warsaw
+    depends_on:
+      backend:
+        condition: service_started
+    restart: unless-stopped
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    ports:
+      - "${BACKEND_PORT}:5000"
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - DB_USER=${DB_USER}
+      - PASSWORD=${PASSWORD}
+      - DATABASE=${DATABASE}
+      - TZ=Europe/Warsaw
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+    restart: unless-stopped
+  scheduler:
+    build:
+      context: ./scheduler
+      dockerfile: Dockerfile.prod
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - DB_USER=${DB_USER}
+      - PASSWORD=${PASSWORD}
+      - DATABASE=${DATABASE}
+      - DISCORD=${DISCORD}
+      - FIREBASE=${FIREBASE}
+      - TZ=Europe/Warsaw
+    depends_on:
+      backend:
+        condition: service_started
+    restart: unless-stopped
+
+  db:
+    image: mariadb:11.8
+    environment:
+      MARIADB_ROOT_PASSWORD: "${PASSWORD}"
+      MARIADB_DATABASE: "${DATABASE}"
+      MARIADB_USER: "${DB_USER}"
+      MARIADB_PASSWORD: "${PASSWORD}"
+      TZ: Europe/Warsaw
+    ports:
+     - "3386:3306"
+    volumes:
+      - tasksDBProd:/var/lib/mysql
+      - ./migration/db_init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+  migration:
+    build:
+      context: ./migration
+      dockerfile: Dockerfile.prod
+    environment:
+      - DB_USER=${DB_USER}
+      - PASSWORD=${PASSWORD}
+      - DATABASE=${DATABASE}
+      - PYTHONDONTWRITEBYTECODE=1
+      - TZ=Europe/Warsaw
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+volumes:
+  tasksDBProd:
+    name: tasksDBProd

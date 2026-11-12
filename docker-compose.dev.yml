@@ -1,0 +1,96 @@
+services:
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "${FRONTEND_PORT}:3000"
+    volumes:
+      - ./frontend:/tasksFrontend
+      - frontendModules:/tasksFrontend/node_modules
+    command: sh -c "npm ci && npm run dev -- --host --port 3000"
+    environment:
+      - VITE_BACKEND=${BACKEND_URL}
+      - TZ=Europe/Warsaw
+    depends_on:
+      backend:
+        condition: service_started
+    restart: unless-stopped
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "${BACKEND_PORT}:5000"
+    volumes:
+      - ./backend:/tasksBackend
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - DB_USER=${DB_USER}
+      - PASSWORD=${PASSWORD}
+      - DATABASE=${DATABASE}
+      - TZ=Europe/Warsaw
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+    restart: unless-stopped
+  scheduler:
+    build:
+      context: ./scheduler
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./scheduler:/tasksSchedule
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - DB_USER=${DB_USER}
+      - PASSWORD=${PASSWORD}
+      - DATABASE=${DATABASE}
+      - DISCORD=${DISCORD}
+      - FIREBASE=${FIREBASE}
+      - TZ=Europe/Warsaw
+    depends_on:
+      backend:
+        condition: service_started
+    restart: unless-stopped
+
+  db:
+    image: mariadb:11.8
+    environment:
+      MARIADB_ROOT_PASSWORD: "${PASSWORD}"
+      MARIADB_DATABASE: "${DATABASE}"
+      MARIADB_USER: "${DB_USER}"
+      MARIADB_PASSWORD: "${PASSWORD}"
+      TZ: Europe/Warsaw
+    ports:
+     - "3366:3306"
+    volumes:
+      - tasksDB:/var/lib/mysql
+      - ./migration/db_init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+  migration:
+    build:
+      context: ./migration
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./migration:/tasksMigration
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - DB_USER=${DB_USER}
+      - PASSWORD=${PASSWORD}
+      - DATABASE=${DATABASE}
+      - TZ=Europe/Warsaw
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+volumes:
+  tasksDB:
+    name: tasksDB
+  frontendModules:

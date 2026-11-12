@@ -8,9 +8,13 @@ jobs:
     name: Deploy dev branch on server
     runs-on: self-hosted
     steps:
-      - name: Teardown
-        run: ./teardown.sh
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          path: dev
+      - name: Teardown
+        working-directory: dev
+        run: ./teardown.sh
       - name: Deploy Docker
+        working-directory: dev
         run: ./deploy.sh

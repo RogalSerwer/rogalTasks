@@ -1,0 +1,12 @@
+FROM node:22
+WORKDIR /tasksFrontend
+COPY package*.json .
+RUN npm ci
+RUN npm install -g serve
+COPY . .
+ARG VITE_BACKEND
+ENV VITE_BACKEND=$VITE_BACKEND
+RUN npm run build
+CMD ["serve", "-s", "dist", "-l", "3000"]
+
+# Potem zamiast serve mozna po prostu zrobić obraz nginxa, bo jest wydajniejszy

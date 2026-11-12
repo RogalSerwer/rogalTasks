@@ -16,7 +16,8 @@
 
   --color-accent: rgb(109, 86, 8);
   --backgroundMain: #101010;
-  --backdrop: rgba(30, 30, 30, 30);
+  --backdrop: rgba(30, 30, 30, 1);
+  --backdrop2: rgba(50, 50, 50, 0.9);
 
   --task-finished-base: #314836;
   --task-finished-hover: rgb(12, 236, 68);
@@ -162,7 +163,7 @@ button:focus-visible {
 }
 
 .modal {
-  z-index: 50;
+  z-index: 500;
   position: fixed;
   top: 0;
   left: 0;
@@ -177,7 +178,7 @@ button:focus-visible {
 }
 
 .modal-hidden {
-  z-index: 50;
+  z-index: 500;
   position: fixed;
   top: 100%;
   left: 0;

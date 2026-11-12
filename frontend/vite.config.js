@@ -14,10 +14,10 @@ export default defineConfig({
 	build: {minify: false, sourcemap:true},
   server: {
 		cors: {
-			origin: ['http://tasks.rogalrogalrogalrogal.online', 'http://localhost:5173', "http://192.168.1.101"],
+			origin: ['http://tasks.rogalrogalrogalrogal.online', 'http://localhost:3000', "http://192.168.1.101"],
 			methods: ['GET', 'POST'],
 			allowedHeaders: ['Content-Type']
 		},
-		allowedHosts: ['rogalrogalrogalrogal.online', 'tasks.rogalrogalrogalrogal.online', "192.168.1.101"]
+		allowedHosts: ['rogalrogalrogalrogal.online', 'tasks.rogalrogalrogalrogal.online', "192.168.1.101", "127.0.0.1"]
 	}
 })

@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react'
-import { useWindow } from './page_window.js'
+import { useWindowContext } from '../utils/window/WindowContext.jsx'
 import ZadaniaLista from "../zadania/zadania.jsx"
-import ZadForm from "../zadania/noweZadania.jsx"
+import ZadForm from "../zadania/addTasks/noweZadania.jsx"
 import Harmonogram from "../harmonogram/harmonogram.jsx"
 import UserConfig from "../user/user.jsx"
 import { useFetchedData } from './page_data.js'
-import PageButton from './pageButton.jsx'
+import PageButton from '../utils/pageButton.jsx'
+import Scheduler from '../scheduler/scheduler.jsx'
+import ButtonsLayout from './buttonLayout.jsx'
 
 function Page() {
 
-    const { bladOkna, zamknijOkno, otworzOkno, trybGlobal } = useWindow()
+    const { bladOkna, zamknijOkno, otworzOkno, trybGlobal, trybMain, changeView} = useWindowContext()
     const { update, zadania, userData, harmonogram, specificDate } = useFetchedData()
-
+    
     useEffect(() => {
         update();
         const interval = setInterval(() => {
@@ -22,13 +24,6 @@ function Page() {
 
     return <>
 
-        <div id='buttonsLayout' className='flex justify-center items-center'>
-            <PageButton clickFunc={() => {otworzOkno(0)}} icon={"icon-plus"}></PageButton>
-            <PageButton clickFunc={() => {otworzOkno(1)}} icon={"icon-calendar-plus-o"} optional={true}></PageButton>
-            <PageButton clickFunc={() => {otworzOkno(3)}} icon={"icon-address-book-o"} optional={true}></PageButton>
-            <PageButton clickFunc={() => {logout()}} icon={"icon-logout"}></PageButton>
-        </div>
-
         <div className="modal-hidden">
             <div className="modal-content">
                 <span className="close" onClick={zamknijOkno}>&times;</span>
@@ -38,8 +33,14 @@ function Page() {
             </div>
 
         </div>
-        {specificDate != "any" && <div><div style={{ margin: "auto", textAlign: 'center', marginTop: "5vh", fontSize: "3vh" }}>Zadania dla {specificDate}</div><button onClick={() => { update("any") }} style={{ marginTop: "1vh" }}>Resetuj</button></div>}
-        <ZadaniaLista zadania={zadania} callback={update} />
+        {trybMain == 0 && <>
+            <ZadaniaLista zadania={zadania} callback={update} /></>}
+        {trybMain == 1 && <>
+            <Scheduler zadania={zadania} harmonogram={harmonogram}></Scheduler></>}
+
+        <ButtonsLayout></ButtonsLayout>
+
+
     </>
 }
 

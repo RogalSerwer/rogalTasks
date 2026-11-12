@@ -1,5 +1,5 @@
-import { useState, useContext } from 'react'
-import { AppContext } from '../utils/AppContext.jsx'
+import { useState } from 'react'
+import { useAppContext } from '../utils/consts/AppContext.jsx'
 
 export async function getData(backendLink, endpoint, endpointInfo) {
     
@@ -13,8 +13,8 @@ export function useFetchedData() {
     const [userData, userSet] = useState([]);
     const [harmonogram, harmoSet] = useState("")
     const [specificDate, setSpecificDate] = useState("any")
-    const user = useContext(AppContext).userID;
-    const backendLink = useContext(AppContext).backendLink;
+    const user = useAppContext().userID;
+    const backendLink = useAppContext().backendLink;
     const pobierzUser = async () => {
         const data = await getData(backendLink, "userData", user)
         userSet(data.dane);

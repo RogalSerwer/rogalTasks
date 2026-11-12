@@ -46,5 +46,5 @@ export function prepareDataToSubmit(dayState, dniTygodnia, infoState) {
     else
         dniD = parseDniWeek(dniTygodnia, dayState.intervalVal)
 
-    return {nazwa: infoState.nazwa, dniD}
+    return {nazwa: infoState.nazwa, waga: infoState.waga, dniD}
 }
