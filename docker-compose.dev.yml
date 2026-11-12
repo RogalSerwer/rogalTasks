@@ -25,6 +25,7 @@ services:
     volumes:
       - ./backend:/tasksBackend
     environment:
+      - PYTHONDONTWRITEBYTECODE=1
       - DB_USER=${DB_USER}
       - PASSWORD=${PASSWORD}
       - DATABASE=${DATABASE}
@@ -39,6 +40,7 @@ services:
     volumes:
       - ./scheduler:/tasksSchedule
     environment:
+      - PYTHONDONTWRITEBYTECODE=1
       - DB_USER=${DB_USER}
       - PASSWORD=${PASSWORD}
       - DATABASE=${DATABASE}
@@ -69,6 +71,7 @@ services:
     volumes:
       - ./migration:/tasksMigration
     environment:
+      - PYTHONDONTWRITEBYTECODE=1
       - DB_USER=${DB_USER}
       - PASSWORD=${PASSWORD}
       - DATABASE=${DATABASE}

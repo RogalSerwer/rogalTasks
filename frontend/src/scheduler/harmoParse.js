@@ -6,7 +6,7 @@ function HarmoDailyParser(entry, currentWeek, currentWeekEnd, start, numHours) {
     const s = new Date(entry.lastAdded)
     const [year, month, day] = getYMD(s);
     const [hour, minute] = entry.dni.time.split(":").map(Number)
-    const [hourRowStartVal, hourRowStart, hourRowEndVal, hourRowEnd] = getHours(hour, minute, entry["waga"]);
+    const [hourRowStartVal, hourRowStart, hourRowEndVal, hourRowEnd] = getHours(hour, entry["waga"]);
 
     if (hourRowStartVal >= start && hourRowEndVal <= start + numHours * 100 + 100) {
         const start = new Date(year, month, day);
@@ -58,7 +58,7 @@ function HarmoWeekParser(entry, currentWeek, start, numHours) {
     if (pass)
     {
         entry.dni.days.forEach((day) => {
-            const [hourRowStartVal, hourRowStart, hourRowEndVal, hourRowEnd] = getHours(day.hour, day.minute, entry["waga"]);
+            const [hourRowStartVal, hourRowStart, hourRowEndVal, hourRowEnd] = getHours(day.hour, entry["waga"]);
             if (hourRowStartVal >= start && hourRowEndVal <= start + numHours * 100 + 100)
                 daysElements[day.id].push({ name: entry.nazwa, hourRowStart, hourRowEnd });
         })

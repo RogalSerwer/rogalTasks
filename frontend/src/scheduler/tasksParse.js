@@ -2,7 +2,7 @@ import { getHours } from "./parseUtils";
 
 function TasksParser(entry, start, numHours) {
     const daysElements = [[], [], [], [], [], [], []];
-    const [hourRowStartVal, hourRowStart, hourRowEndVal, hourRowEnd] = getHours(entry["data"].getHours(), entry["data"].getMinutes(), entry["waga"]);
+    const [hourRowStartVal, hourRowStart, hourRowEndVal, hourRowEnd] = getHours(entry["data"].getHours(), entry["waga"]);
     const day = `${(entry["data"].getDay() + 6) % 7}`
     if (hourRowStartVal >= start && hourRowEndVal <= start + numHours * 100 + 100)
     {

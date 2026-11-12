@@ -5,10 +5,10 @@ export const getYMD = (date) => {
     return [year, month, day];
 }
 
-export const getHours = (hour, minute, weight) => {
-    const hourRowStartVal = hour * 100 + minute;
+export const getHours = (hour, weight) => {
+    const hourRowStartVal = hour * 100;
     const hourRowStart = `g${hourRowStartVal}`
-    const hourRowEndVal = hour * 100 + 100 * weight + minute;
+    const hourRowEndVal = hour * 100 + 100 * weight;
     const hourRowEnd = `g${hourRowEndVal}`
     return [hourRowStartVal, hourRowStart, hourRowEndVal, hourRowEnd]
 }

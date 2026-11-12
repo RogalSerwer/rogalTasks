@@ -20,6 +20,7 @@ services:
     ports:
       - "${BACKEND_PORT}:5000"
     environment:
+      - PYTHONDONTWRITEBYTECODE=1
       - DB_USER=${DB_USER}
       - PASSWORD=${PASSWORD}
       - DATABASE=${DATABASE}
@@ -32,6 +33,7 @@ services:
       context: ./scheduler
       dockerfile: Dockerfile.prod
     environment:
+      - PYTHONDONTWRITEBYTECODE=1
       - DB_USER=${DB_USER}
       - PASSWORD=${PASSWORD}
       - DATABASE=${DATABASE}
@@ -60,6 +62,7 @@ services:
       context: ./migration
       dockerfile: Dockerfile.prod
     environment:
+      - PYTHONDONTWRITEBYTECODE=1
       - DB_USER=${DB_USER}
       - PASSWORD=${PASSWORD}
       - DATABASE=${DATABASE}
