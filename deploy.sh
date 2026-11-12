@@ -3,11 +3,11 @@
 cd "$(dirname "$0")"
 file="$HOME/.config/rogaltasks/dev/.env"
 composefile="./docker-compose.dev.yml"
-name="rogalTasks-dev"
+name="rogaltasks-dev"
 if [ "$1" = "prod" ]; then
     file="$HOME/.config/rogaltasks/main/.env"
     composefile="./docker-compose.main.yml"
-    name="rogalTasks-main"
+    name="rogaltasks-main"
 fi
 
 if [ -r $file ]; then
