@@ -1,0 +1,16 @@
+name: Main Deployment
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    name: Deploy main branch on server
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Teardown
+        run: ./teardown.sh prod
+      - name: Deploy Docker
+        run: ./deploy.sh prod
